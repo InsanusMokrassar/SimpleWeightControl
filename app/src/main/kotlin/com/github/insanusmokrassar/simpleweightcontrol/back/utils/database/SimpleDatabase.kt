@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.utils.DatabaseSimpleLayer
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -9,7 +9,8 @@ open class SimpleDatabase<M: Any> (
         private val modelClass: KClass<M>,
         context: Context,
         databaseName: String,
-        version: Int):
+        version: Int
+):
         SQLiteOpenHelper(
         context,
         databaseName,

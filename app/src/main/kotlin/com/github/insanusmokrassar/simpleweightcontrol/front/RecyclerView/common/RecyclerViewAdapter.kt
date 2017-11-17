@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView
+package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -23,8 +23,8 @@ class RecyclerViewAdapter<T>(
     init {
         registerAdapterDataObserver(
                 object : RecyclerView.AdapterDataObserver() {
-                    override fun onChanged() {
-                        super.onChanged()
+                    override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                        super.onItemRangeChanged(positionStart, itemCount)
                         checkEmpty()
                     }
                 }
@@ -32,9 +32,8 @@ class RecyclerViewAdapter<T>(
         checkEmpty()
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return viewTypeFactory(position, data[position])
-    }
+    override fun getItemViewType(position: Int): Int
+            = viewTypeFactory(position, data[position])
 
     override fun getItemCount(): Int = data.size
 
@@ -59,6 +58,11 @@ class RecyclerViewAdapter<T>(
         items.forEach {
             data.remove(it)
         }
+        notifyDataSetChanged()
+    }
+
+    fun clear() {
+        data.clear()
         notifyDataSetChanged()
     }
 

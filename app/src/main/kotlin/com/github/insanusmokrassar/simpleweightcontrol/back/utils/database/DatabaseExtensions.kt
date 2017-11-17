@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.utils.DatabaseSimpleLayer
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.ContentValues
 import android.database.Cursor
@@ -117,45 +117,25 @@ fun <M: Any> KClass<M>.fromValuesMap(values : Map<KProperty<*>, Any?>): M {
     }
 }
 
-private val extractMap = mapOf<Int, (Cursor, Int) -> Any>(
-        Pair(
-                Cursor.FIELD_TYPE_INTEGER,
-                {
-                    cursor, columnIndex ->
-                    cursor.getInt(columnIndex)
-                }
-        ),
-        Pair(
-                Cursor.FIELD_TYPE_FLOAT,
-                {
-                    cursor, columnIndex ->
-                    cursor.getFloat(columnIndex)
-                }
-        ),
-        Pair(
-                Cursor.FIELD_TYPE_STRING,
-                {
-                    cursor, columnIndex ->
-                    cursor.getString(columnIndex)
-                }
-        ),
-        Pair(
-                Cursor.FIELD_TYPE_BLOB,
-                {
-                    cursor, columnIndex ->
-                    cursor.getBlob(columnIndex)
-                }
-        )
-)
-
 fun <M: Any> Cursor.extract(modelClass: KClass<M>): M {
     val properties = modelClass.getVariablesMap()
     val values = HashMap<KProperty<*>, Any?>()
     properties.values.forEach {
         val columnIndex = getColumnIndex(it.name)
+        val value: Any = when(it.returnClass()) {
+            Boolean::class -> getInt(columnIndex) == 1
+            Int::class -> getInt(columnIndex)
+            Long::class -> getLong(columnIndex)
+            Float::class -> getFloat(columnIndex)
+            Double::class -> getDouble(columnIndex)
+            Byte::class -> getInt(columnIndex)
+            ByteArray::class -> getInt(columnIndex)
+            Short::class -> getShort(columnIndex)
+            else -> getString(columnIndex)
+        }
         values.put(
                 it,
-                extractMap[getType(columnIndex)] ?. invoke(this, columnIndex)
+                value
         )
     }
     return modelClass.fromValuesMap(values)

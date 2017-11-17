@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.utils.DatabaseSimpleLayer
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import kotlin.reflect.*
 import kotlin.reflect.full.instanceParameter

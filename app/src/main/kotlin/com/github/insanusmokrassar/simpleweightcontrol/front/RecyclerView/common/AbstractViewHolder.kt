@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView
+package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common
 
 import android.support.v7.widget.RecyclerView
 import android.view.View

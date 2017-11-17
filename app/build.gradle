@@ -20,6 +20,11 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 }
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
