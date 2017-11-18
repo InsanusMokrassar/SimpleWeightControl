@@ -71,11 +71,11 @@ class HomeActivity: AppCompatActivity() {
     private fun updateWeightList(page: Int = 0) {
         adapter ?.let {
             async {
-                if (page == 0) {
-                    it.clear()
-                }
                 val items = weightsDatabase().lastWeights(page, 20).toTypedArray()
                 launch (UI) {
+                    if (page == 0) {
+                        it.clear()
+                    }
                     it.addItems(*items)
                 }
             }
