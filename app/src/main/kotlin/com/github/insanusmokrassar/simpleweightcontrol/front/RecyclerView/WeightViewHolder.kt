@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
-import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
+import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.createEditWeightDialog
 import kotlinx.coroutines.experimental.async

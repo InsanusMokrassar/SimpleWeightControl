@@ -1,7 +1,10 @@
 package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
-import kotlin.reflect.*
+import kotlin.reflect.KCallable
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.instanceParameter
+import kotlin.reflect.memberProperties
 
 @Target(AnnotationTarget.PROPERTY)
 @MustBeDocumented
