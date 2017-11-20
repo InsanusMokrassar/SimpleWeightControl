@@ -3,6 +3,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.front.extensions
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
@@ -119,4 +120,15 @@ fun <T: View> Context.createCustomViewDialog(
     }
 
     return builder.create()
+}
+
+fun AlertDialog.setDismissChecker(checker: () -> Boolean) : AlertDialog {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        setOnDismissListener {
+            if (!checker()) {
+                show()
+            }
+        }
+    }
+    return this
 }

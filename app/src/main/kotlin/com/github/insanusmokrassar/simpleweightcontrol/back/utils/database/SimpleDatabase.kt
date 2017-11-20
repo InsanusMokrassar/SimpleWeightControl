@@ -3,6 +3,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.github.insanusmokrassar.IObjectK.interfaces.CommonIObject
 import kotlin.reflect.KClass
 
 open class SimpleDatabase<M: Any> (
@@ -10,13 +11,8 @@ open class SimpleDatabase<M: Any> (
         context: Context,
         databaseName: String,
         version: Int
-):
-        SQLiteOpenHelper(
-        context,
-        databaseName,
-        null,
-        version
-) {
+): SQLiteOpenHelper(context, databaseName, null, version) {
+
     override fun onCreate(db: SQLiteDatabase) {
         db.createTableIfNotExist(modelClass)
     }
@@ -27,7 +23,7 @@ open class SimpleDatabase<M: Any> (
         // override onUpgrade
     }
 
-    fun insert(value: M): Boolean {
+    open fun insert(value: M): Boolean {
         return writableDatabase.insert(
                 modelClass.tableName(),
                 null,
@@ -35,7 +31,7 @@ open class SimpleDatabase<M: Any> (
         ) > 0
     }
 
-    fun find(
+    open fun find(
             where: String? = null,
             orderBy: String? = null,
             limit: String? = null
@@ -52,7 +48,7 @@ open class SimpleDatabase<M: Any> (
         ).extractAll(modelClass, true)
     }
 
-    fun update(
+    open fun update(
             value: M,
             where: String? = value.getPrimaryFieldsSearchQuery(),
             onConflict: Int = SQLiteDatabase.CONFLICT_REPLACE
@@ -66,7 +62,7 @@ open class SimpleDatabase<M: Any> (
         ) > 0
     }
 
-    fun remove(where: String? = null) {
+    open fun remove(where: String? = null) {
         writableDatabase.delete(
                 modelClass.tableName(),
                 where,
@@ -74,7 +70,7 @@ open class SimpleDatabase<M: Any> (
         )
     }
 
-    fun remove(value: M) {
+    open fun remove(value: M) {
         writableDatabase.delete(
                 modelClass.tableName(),
                 value.getPrimaryFieldsSearchQuery(),

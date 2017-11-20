@@ -13,10 +13,16 @@ data class WeightData(
         @Autoincrement
         val id: Int? = null
 ) {
-        constructor(weight: Float): this(weight, Date().time) {
+        constructor(weight: Float): this(weight, Date().time)
+
+        init {
                 Log.i(
                         WeightData::class.java.simpleName,
-                        SimpleDateFormat.getDateTimeInstance().format(date)
+                        "Weight data: $weight : ${
+                        SimpleDateFormat
+                                .getDateTimeInstance()
+                                .format(date)
+                        }"
                 )
         }
 }
