@@ -75,7 +75,8 @@ fun Context.createEditWeightDialog(
                         success(
                                 WeightData(
                                         weightEditText.text.toString().toFloat(),
-                                        actualTime
+                                        actualTime,
+                                        weight ?. id
                                 )
                         )
                         false
@@ -103,7 +104,8 @@ fun getCalendar(datePicker: DatePicker, timePicker: TimePicker): Calendar {
                 datePicker.month,
                 datePicker.dayOfMonth,
                 timePicker.hour,
-                timePicker.minute
+                timePicker.minute,
+                0
         )
     } else {
         calendar.set(
@@ -111,7 +113,8 @@ fun getCalendar(datePicker: DatePicker, timePicker: TimePicker): Calendar {
                 datePicker.month,
                 datePicker.dayOfMonth,
                 timePicker.currentHour,
-                timePicker.currentMinute
+                timePicker.currentMinute,
+                0
         )
     }
 
