@@ -19,12 +19,41 @@ class RecyclerViewAdapter<T>(
         private val data: MutableList<T> = ArrayList()
 ): RecyclerView.Adapter<AbstractViewHolder<T>>() {
     var emptyView: View? = null
+        set(value) {
+            field = value
+            checkEmpty()
+        }
 
     init {
         registerAdapterDataObserver(
                 object : RecyclerView.AdapterDataObserver() {
                     override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
                         super.onItemRangeChanged(positionStart, itemCount)
+                        checkEmpty()
+                    }
+
+                    override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                        super.onItemRangeChanged(positionStart, itemCount, payload)
+                        checkEmpty()
+                    }
+
+                    override fun onChanged() {
+                        super.onChanged()
+                        checkEmpty()
+                    }
+
+                    override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                        super.onItemRangeRemoved(positionStart, itemCount)
+                        checkEmpty()
+                    }
+
+                    override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                        super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                        checkEmpty()
+                    }
+
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        super.onItemRangeInserted(positionStart, itemCount)
                         checkEmpty()
                     }
                 }
