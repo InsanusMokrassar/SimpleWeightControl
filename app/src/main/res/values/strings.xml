@@ -6,4 +6,5 @@
     <string name="typedWrongWeight">You have typed wrong weight</string>
     <string name="typedWrongTime">You have typed wrong time</string>
     <string name="editWeightRecord">Add/edit weight record</string>
+    <string name="delete">Delete</string>
 </resources>

@@ -96,6 +96,12 @@ fun Any.getPrimaryFieldsSearchQuery(): String {
     )
 }
 
+fun <M: Any> Collection<M>.getPrimaryFieldsSearchQuery(): String {
+    return joinToString(") OR (", "(", ")") {
+        it.getPrimaryFieldsSearchQuery()
+    }
+}
+
 fun <M: Any> KClass<M>.fromValuesMap(values : Map<KProperty<*>, Any?>): M {
     if (constructors.isEmpty()) {
         throw IllegalStateException("For some of reason, can't create correct realisation of model")

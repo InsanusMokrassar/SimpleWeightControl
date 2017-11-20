@@ -15,9 +15,9 @@ class RecyclerViewAdapter<T>(
         private val viewTypeFactory: (
                 index: Int,
                 current: T
-        ) -> Int = { _, _ -> 0 }
+        ) -> Int = { _, _ -> 0 },
+        private val data: MutableList<T> = ArrayList()
 ): RecyclerView.Adapter<AbstractViewHolder<T>>() {
-    private val data = ArrayList<T>()
     var emptyView: View? = null
 
     init {

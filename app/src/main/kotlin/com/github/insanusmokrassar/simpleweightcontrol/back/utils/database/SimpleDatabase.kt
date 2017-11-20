@@ -1,16 +1,18 @@
 package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.Context
+import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.github.insanusmokrassar.IObjectK.interfaces.CommonIObject
 import kotlin.reflect.KClass
 
 open class SimpleDatabase<M: Any> (
-        private val modelClass: KClass<M>,
+        protected val modelClass: KClass<M>,
         context: Context,
         databaseName: String,
-        version: Int
+        version: Int,
+        protected val defaultOrderBy: String? = null
 ): SQLiteOpenHelper(context, databaseName, null, version) {
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -33,7 +35,7 @@ open class SimpleDatabase<M: Any> (
 
     open fun find(
             where: String? = null,
-            orderBy: String? = null,
+            orderBy: String? = defaultOrderBy,
             limit: String? = null
     ): List<M> {
         return readableDatabase.query(
@@ -47,6 +49,18 @@ open class SimpleDatabase<M: Any> (
                 limit
         ).extractAll(modelClass, true)
     }
+
+    open fun find(
+            value: M
+    ): M? = find(value.getPrimaryFieldsSearchQuery()).firstOrNull()
+
+    open fun findPage(
+            page: Int, size: Int, orderBy: String? = defaultOrderBy
+    ): List<M> = find(page * size,size, orderBy)
+
+    open fun find(
+            offset: Int, size: Int, orderBy: String? = defaultOrderBy
+    ): List<M> = find(orderBy = orderBy, limit = "$offset,$size")
 
     open fun update(
             value: M,
@@ -62,18 +76,27 @@ open class SimpleDatabase<M: Any> (
         ) > 0
     }
 
-    open fun remove(where: String? = null) {
-        writableDatabase.delete(
+    open fun remove(where: String? = null): Boolean {
+        return writableDatabase.delete(
                 modelClass.tableName(),
                 where,
                 null
-        )
+        ) > 0
     }
 
-    open fun remove(value: M) {
-        writableDatabase.delete(
+    open fun remove(element: M): Boolean {
+        return writableDatabase.delete(
                 modelClass.tableName(),
-                value.getPrimaryFieldsSearchQuery(),
+                element.getPrimaryFieldsSearchQuery(),
+                null
+        ) > 0
+    }
+
+    open fun size(where: String? = null): Long {
+        return DatabaseUtils.queryNumEntries(
+                readableDatabase,
+                modelClass.tableName(),
+                where,
                 null
         )
     }

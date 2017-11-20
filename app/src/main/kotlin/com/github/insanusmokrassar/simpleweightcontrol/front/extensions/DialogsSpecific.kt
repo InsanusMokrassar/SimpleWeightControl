@@ -2,6 +2,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.front.extensions
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Build
 import android.view.LayoutInflater
 import android.widget.DatePicker
@@ -14,7 +15,8 @@ import java.util.*
 
 fun Context.createEditWeightDialog(
         weight: WeightData? = null,
-        success: (WeightData) -> Unit
+        success: (WeightData) -> Unit,
+        delete: (WeightData) -> Unit = {}
 ): AlertDialog {
     val builder = AlertDialog.Builder(this)
 
@@ -33,6 +35,14 @@ fun Context.createEditWeightDialog(
         weightEditText.setText(it.weight.toString())
 
         calendar.time = Date(it.date)
+
+        builder.setNegativeButton(
+                getString(R.string.delete),
+                { dialogInterface, i ->
+                    delete(it)
+                    dialogInterface.dismiss()
+                }
+        )
     } ?: {
         calendar.time = Date(System.currentTimeMillis())
     }()
