@@ -30,9 +30,12 @@ class WeightViewHolder(
                 context.createEditWeightDialog(
                         currentItem,
                         {
-                            refreshItem(it)
+                            currentItem = it
+                            adapterWeakReference.get() ?. notifyDataSetChanged()
                             async {
-                                WeightHelper(context).update(it)
+                                currentItem ?. let {
+                                    WeightHelper(context).update(it)
+                                }
                             }
                         },
                         {

@@ -12,11 +12,11 @@ class RecyclerViewAdapter<T>(
                 viewType: Int,
                 adapter: RecyclerViewAdapter<T>
         ) -> AbstractViewHolder<T>,
+        private val data: List<T>,
         private val viewTypeFactory: (
                 index: Int,
                 current: T
-        ) -> Int = { _, _ -> 0 },
-        private val data: MutableList<T> = ArrayList()
+        ) -> Int = { _, _ -> 0 }
 ): RecyclerView.Adapter<AbstractViewHolder<T>>() {
     var emptyView: View? = null
         set(value) {
@@ -72,28 +72,6 @@ class RecyclerViewAdapter<T>(
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AbstractViewHolder<T> =
             viewHolderFactory(parent!!, viewType, this)
-
-    fun addItems(vararg items: T) {
-        data.addAll(items)
-        notifyItemRangeChanged(data.size - items.size, data.size)
-    }
-
-    fun removeItem(i: Int) {
-        data.removeAt(i)
-        notifyItemRangeChanged(i, data.size)
-    }
-
-    fun removeItem(vararg items: T) {
-        items.forEach {
-            data.remove(it)
-        }
-        notifyDataSetChanged()
-    }
-
-    fun clear() {
-        data.clear()
-        notifyDataSetChanged()
-    }
 
     private fun checkEmpty() {
         emptyView ?. let {

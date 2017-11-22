@@ -125,7 +125,7 @@ open class MutableListDatabase<M: Any> (
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<M> =
-            find(orderBy = defaultOrderBy, limit = "$fromIndex,${toIndex - fromIndex}").toMutableList()
+            find(orderBy = defaultOrderBy, limit = buildLimit(fromIndex, toIndex - fromIndex)).toMutableList()
 
 }
 

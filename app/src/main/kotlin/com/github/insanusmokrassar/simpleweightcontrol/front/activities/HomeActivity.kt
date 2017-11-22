@@ -26,7 +26,7 @@ class HomeActivity: AppCompatActivity() {
                     adapter: RecyclerViewAdapter<WeightData> ->
                     WeightViewHolder(layoutInflater, parent, adapter)
                 },
-                data = WeightHelper(this)
+                WeightHelper(this)
         )
 
         adapter ?. emptyView = findViewById(R.id.emptyWeightListView)

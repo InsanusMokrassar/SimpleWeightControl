@@ -6,6 +6,12 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import kotlin.reflect.KClass
 
+fun buildLimit(offset: Int? = null, limit: Int = 10): String {
+    return offset ?. let {
+        "$offset,$limit"
+    } ?: limit.toString()
+}
+
 open class SimpleDatabase<M: Any> (
         protected val modelClass: KClass<M>,
         context: Context,
@@ -59,7 +65,7 @@ open class SimpleDatabase<M: Any> (
 
     open fun find(
             offset: Int, size: Int, orderBy: String? = defaultOrderBy
-    ): List<M> = find(orderBy = orderBy, limit = "$offset,$size")
+    ): List<M> = find(orderBy = orderBy, limit = buildLimit(offset, size))
 
     open fun update(
             value: M,
