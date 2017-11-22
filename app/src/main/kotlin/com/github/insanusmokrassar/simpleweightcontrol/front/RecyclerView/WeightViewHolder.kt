@@ -37,15 +37,17 @@ class WeightViewHolder(
                         },
                         {
                             WeightHelper(context).remove(it)
-                            adapterWeakReference.get() ?. let {
-                                it.notifyDataSetChanged()
-                            }
+                            adapterWeakReference.get() ?. notifyDataSetChanged()
                         }
                 ).show()
             }
         }()
         currentItem = item
         itemView.findViewById<TextView>(android.R.id.text1).text = item.weight.toString()
-        itemView.findViewById<TextView>(android.R.id.text2).text = DateFormat.getDateTimeInstance().format(Date(item.date))
+        itemView.findViewById<TextView>(android.R.id.text2).text = DateFormat.getTimeInstance(
+                DateFormat.SHORT
+        ).format(
+                Date(item.date)
+        )
     }
 }
