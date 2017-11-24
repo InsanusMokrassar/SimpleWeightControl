@@ -25,8 +25,8 @@ fun Context.createEditWeightDialog(
     )
 
     val weightEditText = view.findViewById<EditText>(R.id.weightEditText)
-    val weightDateButton = view.findViewById<Button>(R.id.weightDateButton)
-    val weightTimeButton = view.findViewById<Button>(R.id.weightTimeButton)
+    val weightDatePicker = view.findViewById<DatePicker>(R.id.weightDatePicker)
+    val weightTimePicker = view.findViewById<TimePicker>(R.id.weightTimePicker)
 
     val calendar: Calendar = Calendar.getInstance()
     weight ?. let {
@@ -45,44 +45,18 @@ fun Context.createEditWeightDialog(
         calendar.time = Date(System.currentTimeMillis())
     }()
 
-    weightDateButton.setOnClickListener {
-        DatePickerDialog(
-                this,
-                {
-                    _, year, monthOfYear, dayOfMonth ->
-                    calendar.set(year, monthOfYear, dayOfMonth)
-                },
-                calendar.year(),
-                calendar.month(),
-                calendar.day()
-        ).show()
+    weightDatePicker.updateDate(calendar.year(), calendar.month(), calendar.day())
+
+    weightTimePicker.setIs24HourView(true)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        weightTimePicker.hour = calendar.hourOfDay()
+        weightTimePicker.minute = calendar.minutes()
+    } else {
+        weightTimePicker.currentHour = calendar.hourOfDay()
+        weightTimePicker.currentMinute = calendar.minutes()
     }
 
-    weightTimeButton.setOnClickListener {
-        TimePickerDialog(
-                this,
-                { _: TimePicker, hours: Int, minutes: Int ->
-                    calendar.set(Calendar.HOUR_OF_DAY, hours)
-                    calendar.set(Calendar.MINUTE, minutes)
-                },
-                calendar.hourOfDay(),
-                calendar.minutes(),
-                true
-        ).show()
-    }
-
-//    weightDatePicker.updateDate(calendar.year(), calendar.month(), calendar.day())
-//
-//    weightTimePicker.setIs24HourView(true)
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//        weightTimePicker.hour = calendar.hourOfDay()
-//        weightTimePicker.minute = calendar.minutes()
-//    } else {
-//        weightTimePicker.currentHour = calendar.hourOfDay()
-//        weightTimePicker.currentMinute = calendar.minutes()
-//    }
-//
-//    weightDatePicker.maxDate = System.currentTimeMillis()
+    weightDatePicker.maxDate = System.currentTimeMillis()
 
     builder.setView(view)
 
@@ -92,7 +66,7 @@ fun Context.createEditWeightDialog(
             {
                 dialogInterface, i ->
                 wasError = try {
-                    val actualTime = calendar.timeInMillis
+                    val actualTime = getCalendar(weightDatePicker, weightTimePicker).timeInMillis
                     if (actualTime > System.currentTimeMillis()) {
                         Toast.makeText(this, getString(R.string.typedWrongTime), Toast.LENGTH_LONG).show()
                         true
