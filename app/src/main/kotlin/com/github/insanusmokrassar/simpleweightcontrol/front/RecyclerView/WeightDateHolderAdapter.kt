@@ -52,7 +52,10 @@ class WeightDateHolderAdapter(
             }
             average /= currentList.size
 
-            itemView.findViewById<TextView>(R.id.averageWeightTextView).text = average.toString()
+            itemView.findViewById<TextView>(R.id.averageWeightTextView).text = String.format(
+                    "%.1f",
+                    average
+            )
         }
         adapter.notifyDataSetChanged()
     }
