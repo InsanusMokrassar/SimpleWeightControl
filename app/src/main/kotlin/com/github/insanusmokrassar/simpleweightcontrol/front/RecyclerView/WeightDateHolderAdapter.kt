@@ -1,5 +1,6 @@
 package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView
 
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -35,7 +36,14 @@ class WeightDateHolderAdapter(
     )
 
     init {
-        itemView.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).adapter = adapter
+        val recyclerView = itemView.findViewById<RecyclerView>(R.id.weightsItemRecyclerView)
+        recyclerView.adapter = adapter
+        recyclerView.addItemDecoration(
+                DividerItemDecoration(
+                        itemView.context,
+                        DividerItemDecoration.HORIZONTAL
+                )
+        )
     }
 
     override fun refreshItem(item: List<WeightData>) {

@@ -2,6 +2,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.front.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
@@ -43,7 +44,9 @@ class HomeActivity: AppCompatActivity() {
 
         adapter ?. emptyView = findViewById(R.id.emptyWeightListView)
 
-        findViewById<RecyclerView>(R.id.weightsRecyclerView).adapter = adapter
+        val recyclerView = findViewById<RecyclerView>(R.id.weightsRecyclerView)
+        recyclerView.adapter = adapter
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

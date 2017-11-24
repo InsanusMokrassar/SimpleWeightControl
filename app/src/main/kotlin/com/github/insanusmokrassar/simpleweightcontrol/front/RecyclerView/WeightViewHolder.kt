@@ -3,6 +3,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
@@ -19,7 +20,7 @@ class WeightViewHolder(
         inflater: LayoutInflater,
         container: ViewGroup
 ): AbstractViewHolder<WeightData>({
-    inflater.inflate(android.R.layout.simple_list_item_2, container, false)
+    inflater.inflate(R.layout.item_weight, container, false)
 }) {
     private var currentItem: WeightData? = null
 

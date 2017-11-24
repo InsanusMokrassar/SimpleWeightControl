@@ -20,7 +20,7 @@ fun Context.createEditWeightDialog(
     val builder = AlertDialog.Builder(this)
 
     val view = LayoutInflater.from(this).inflate(
-            R.layout.edit_weight_item,
+            R.layout.fragment_edit_weight_item,
             null,
             false
     )
