@@ -11,6 +11,7 @@
     </item>
     <item>
         <shape>
+            <solid android:color="@android:color/transparent"/>
             <corners android:topLeftRadius="@dimen/viewDefaultMediumMargin"/>
             <stroke
                 android:color="@color/colorPrimary"
