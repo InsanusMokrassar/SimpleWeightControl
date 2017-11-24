@@ -9,6 +9,17 @@ import kotlin.collections.HashSet
 
 private val millisInDay: Long = 48*60*60*1000
 
+private var weightHelper: WeightHelper? = null
+
+fun Context.weightHelper(): WeightHelper {
+    return weightHelper ?.let {
+        it
+    } ?: {
+        weightHelper = WeightHelper(this)
+        weightHelper()
+    }()
+}
+
 class WeightHelper internal constructor(
         c: Context
 ): MutableListDatabase<WeightData>(

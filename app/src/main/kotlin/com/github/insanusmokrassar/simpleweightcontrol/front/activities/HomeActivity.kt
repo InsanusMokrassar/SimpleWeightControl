@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysList
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.WeightDateHolderAdapter
@@ -24,8 +25,6 @@ class HomeActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val helper = WeightHelper(this)
-
         adapter = RecyclerViewAdapter(
                 {
                     parent: ViewGroup,
@@ -33,10 +32,10 @@ class HomeActivity: AppCompatActivity() {
                     _: RecyclerViewAdapter<List<WeightData>> ->
                     WeightDateHolderAdapter(layoutInflater, parent)
                 },
-                WeightsDaysList(helper)
+                WeightsDaysList(this.weightHelper())
         )
 
-        helper.databaseObserver.subscribe {
+        this.weightHelper().databaseObserver.subscribe {
             launch (UI) {
                 adapter ?. notifyDataSetChanged()
             }
@@ -58,7 +57,7 @@ class HomeActivity: AppCompatActivity() {
         if (item.itemId == R.id.addWeightMenuItem) {
             createEditWeightDialog (
                     success = { weightData ->
-                        WeightHelper(this).insert(weightData)
+                        this.weightHelper().insert(weightData)
                         adapter ?. notifyDataSetChanged()
                     }
             ).show()
