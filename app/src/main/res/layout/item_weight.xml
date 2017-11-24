@@ -3,7 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-    <include
-        layout="@android:layout/simple_list_item_2"/>
+    android:layout_margin="@dimen/viewDefaultSmallMargin"
+    android:padding="@dimen/viewDefaultSmallMargin"
+    android:orientation="vertical"
+    android:background="@drawable/item_weight_background"
+    android:gravity="center">
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItem" />
+
+    <TextView
+        android:id="@android:id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItemSecondary" />
 </LinearLayout>

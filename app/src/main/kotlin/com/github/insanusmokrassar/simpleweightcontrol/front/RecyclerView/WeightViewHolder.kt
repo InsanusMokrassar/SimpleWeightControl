@@ -15,6 +15,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import java.lang.ref.WeakReference
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 class WeightViewHolder(
@@ -40,15 +41,15 @@ class WeightViewHolder(
                             }
                         },
                         {
-                            context.weightHelper().remove(it)
+                            WeightHelper(context).remove(it)
                         }
                 ).show()
             }
         }()
         currentItem = item
         itemView.findViewById<TextView>(android.R.id.text1).text = item.weight.toString()
-        itemView.findViewById<TextView>(android.R.id.text2).text = DateFormat.getTimeInstance(
-                DateFormat.SHORT
+        itemView.findViewById<TextView>(android.R.id.text2).text = SimpleDateFormat(
+                "HH:mm"
         ).format(
                 Date(item.date)
         )

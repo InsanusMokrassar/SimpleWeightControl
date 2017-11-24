@@ -36,14 +36,7 @@ class WeightDateHolderAdapter(
     )
 
     init {
-        val recyclerView = itemView.findViewById<RecyclerView>(R.id.weightsItemRecyclerView)
-        recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(
-                DividerItemDecoration(
-                        itemView.context,
-                        DividerItemDecoration.HORIZONTAL
-                )
-        )
+        itemView.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).adapter = adapter
     }
 
     override fun refreshItem(item: List<WeightData>) {
