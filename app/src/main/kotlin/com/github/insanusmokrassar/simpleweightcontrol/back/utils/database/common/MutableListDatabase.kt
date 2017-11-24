@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common
 
 import android.content.Context
 import android.util.Log
@@ -24,7 +24,7 @@ open class MutableListDatabase<M: Any> (
 
     override fun indexOf(element: M): Int {
         forEachIndexed { index, m -> if (m == element) return index }
-        throw IllegalArgumentException("Object was not found in the database")
+        return -1
     }
 
     override fun isEmpty(): Boolean = size == 0
@@ -117,11 +117,8 @@ open class MutableListDatabase<M: Any> (
 
     override fun set(index: Int, element: M): M {
         val old = get(index)
-        return if (update(element, old.getPrimaryFieldsSearchQuery())) {
-            element
-        } else {
-            old
-        }
+        update(element, old.getPrimaryFieldsSearchQuery())
+        return old
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<M> =

@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common
 
 import android.content.ContentValues
 import android.database.Cursor

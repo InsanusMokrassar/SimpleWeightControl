@@ -2,7 +2,12 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.Context
 import com.github.insanusmokrassar.simpleweightcontrol.R
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.MutableListDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
+import java.util.*
+import kotlin.collections.HashSet
+
+private val millisInDay: Long = 48*60*60*1000
 
 class WeightHelper internal constructor(
         c: Context
@@ -12,4 +17,19 @@ class WeightHelper internal constructor(
         c.getString(R.string.standardDatabaseName),
         1,
         "date DESC"
-)
+) {
+    fun getByDay(date: Long): List<WeightData> {
+        val day = extractDay(date)
+        return find("(date >= $day) AND (date < ${day + millisInDay})")
+    }
+
+    fun getDays(): Set<Long> {
+        val days = HashSet<Long>()
+        forEach {
+            days.add(extractDay(it.date))
+        }
+        return days
+    }
+}
+
+fun extractDay(date: Long): Long = date - (date % millisInDay)

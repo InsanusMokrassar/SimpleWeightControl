@@ -90,10 +90,7 @@ fun <T> Context.createRecyclerViewDialog(
     )
     recyclerView.layoutManager = layoutManager
     recyclerView.layoutParams = lp
-    val adapter = RecyclerViewAdapter(viewHolderFactory)
-    data.forEach {
-        adapter.addItems(it)
-    }
+    val adapter = RecyclerViewAdapter(viewHolderFactory, data)
     recyclerView.adapter = adapter
 
     val builder = AlertDialog.Builder(this)

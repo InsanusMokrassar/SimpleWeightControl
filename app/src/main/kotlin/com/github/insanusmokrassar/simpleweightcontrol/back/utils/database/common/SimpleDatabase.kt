@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common
 
 import android.content.Context
 import android.database.DatabaseUtils
@@ -19,6 +19,16 @@ open class SimpleDatabase<M: Any> (
         version: Int,
         protected val defaultOrderBy: String? = null
 ): SQLiteOpenHelper(context, databaseName, null, version) {
+
+    private var observer: DatabaseObserver<M>? = null
+
+    val databaseObserver: DatabaseObserver<M>
+        get() {
+            observer ?.let { return it }
+            observer = DatabaseObserver(this)
+            observer!!.startWatching()
+            return observer!!
+        }
 
     override fun onCreate(db: SQLiteDatabase) {
         db.createTableIfNotExist(modelClass)

@@ -14,10 +14,9 @@ import kotlin.collections.ArrayList
 
 class WeightDateHolderAdapter(
         inflater: LayoutInflater,
-        container: ViewGroup,
-        adapter: RecyclerViewAdapter<WeightData>
+        container: ViewGroup
 ) : AbstractViewHolder<List<WeightData>>({
-    val view = inflater.inflate(R.layout.edit_weight_item, container, false)
+    val view = inflater.inflate(R.layout.item_weight_date, container, false)
     view.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).setHasFixedSize(true)
     view
 }) {
@@ -26,10 +25,13 @@ class WeightDateHolderAdapter(
             {
                 parent: ViewGroup,
                 _: Int,
-                adapter: RecyclerViewAdapter<WeightData> ->
-                WeightViewHolder(inflater, parent, adapter)
+                _: RecyclerViewAdapter<WeightData> ->
+                WeightViewHolder(
+                        inflater,
+                        parent
+                )
             },
-            data = currentList
+            currentList
     )
 
     init {

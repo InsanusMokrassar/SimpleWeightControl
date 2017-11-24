@@ -8,20 +8,20 @@ import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.createEditWeightDialog
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import java.lang.ref.WeakReference
 import java.text.DateFormat
 import java.util.*
 
 class WeightViewHolder(
         inflater: LayoutInflater,
-        container: ViewGroup,
-        adapter: RecyclerViewAdapter<WeightData>
+        container: ViewGroup
 ): AbstractViewHolder<WeightData>({
     inflater.inflate(android.R.layout.simple_list_item_2, container, false)
 }) {
     private var currentItem: WeightData? = null
-    private val adapterWeakReference = WeakReference<RecyclerViewAdapter<WeightData>>(adapter)
 
     override fun refreshItem(item: WeightData) {
         currentItem ?: {
@@ -30,9 +30,8 @@ class WeightViewHolder(
                 context.createEditWeightDialog(
                         currentItem,
                         {
-                            currentItem = it
-                            adapterWeakReference.get() ?. notifyDataSetChanged()
                             async {
+                                currentItem = it
                                 currentItem ?. let {
                                     WeightHelper(context).update(it)
                                 }
@@ -40,7 +39,6 @@ class WeightViewHolder(
                         },
                         {
                             WeightHelper(context).remove(it)
-                            adapterWeakReference.get() ?. notifyDataSetChanged()
                         }
                 ).show()
             }

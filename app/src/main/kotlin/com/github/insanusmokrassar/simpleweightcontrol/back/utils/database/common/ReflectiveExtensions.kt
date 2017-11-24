@@ -1,4 +1,4 @@
-package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common
 
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
