@@ -13,7 +13,7 @@ class WeightsDaysList(
 
     init {
         db.databaseObserver.subscribe {
-            synchronized(cache, {
+            synchronized(this, {
                 cache.clear()
                 cache.addAll(db.getDays().filter { it in firstDay..lastDay })
             })
@@ -32,9 +32,8 @@ class WeightsDaysList(
         }
     }
 
-    override fun containsAll(elements: Collection<List<WeightData>>): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun containsAll(elements: Collection<List<WeightData>>): Boolean =
+            elements.firstOrNull { !contains(it) } == null
 
     override fun get(index: Int): List<WeightData> = db.getByDay(cache[index])
 
