@@ -9,14 +9,17 @@ class WeightsDaysList(
         private val firstDay: Long = 0,
         private val lastDay: Long = Long.MAX_VALUE
 ): List<List<WeightData>> {
-    private val cache = ArrayList<Long>(db.getDays().filter { it in firstDay..lastDay })
+    private val cache = ArrayList<Long>()
+
+    private val updateCache = {
+        cache.clear()
+        cache.addAll(db.getDays().filter { it in firstDay..lastDay })
+    }
 
     init {
+        updateCache()
         db.databaseObserver.subscribe {
-            synchronized(this, {
-                cache.clear()
-                cache.addAll(db.getDays().filter { it in firstDay..lastDay })
-            })
+            synchronized(this, updateCache)
         }
     }
 

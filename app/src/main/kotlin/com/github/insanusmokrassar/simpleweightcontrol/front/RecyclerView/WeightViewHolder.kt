@@ -8,13 +8,8 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.Weigh
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
-import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.createEditWeightDialog
-import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
-import java.lang.ref.WeakReference
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
