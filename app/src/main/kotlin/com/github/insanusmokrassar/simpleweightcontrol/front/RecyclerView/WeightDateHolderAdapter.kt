@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.github.insanusmokrassar.simpleweightcontrol.R
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.getDate
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
@@ -43,18 +45,13 @@ class WeightDateHolderAdapter(
         currentList.addAll(item)
         if (currentList.isNotEmpty()) {
             itemView.findViewById<TextView>(R.id.weightDateTextView).text = DateFormat.getDateInstance().format(
-                Date(item.first().date)
+                Date(item.getDate())
             )
 
-            var average = 0F
-            currentList.forEach {
-                average += it.weight
-            }
-            average /= currentList.size
 
             itemView.findViewById<TextView>(R.id.averageWeightTextView).text = String.format(
                     "%.1f",
-                    average
+                    currentList.calculateAverage()
             )
         }
         adapter.notifyDataSetChanged()

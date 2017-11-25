@@ -47,4 +47,5 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     })
     implementation 'com.github.insanusmokrassar:IObjectK:1.5'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
 }

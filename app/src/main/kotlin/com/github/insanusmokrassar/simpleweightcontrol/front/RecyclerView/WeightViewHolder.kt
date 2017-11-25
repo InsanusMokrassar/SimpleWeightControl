@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getTimeString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
@@ -43,10 +44,6 @@ class WeightViewHolder(
         }()
         currentItem = item
         itemView.findViewById<TextView>(android.R.id.text1).text = item.weight.toString()
-        itemView.findViewById<TextView>(android.R.id.text2).text = SimpleDateFormat(
-                "HH:mm"
-        ).format(
-                Date(item.date)
-        )
+        itemView.findViewById<TextView>(android.R.id.text2).text = getTimeString(item.date)
     }
 }

@@ -4,8 +4,11 @@ import android.content.Context
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.MutableListDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
-private val millisInDay: Long = 24*60*60*1000
+val millisInDay: Long = 24*60*60*1000
 
 private var weightHelper: WeightHelper? = null
 
@@ -42,3 +45,17 @@ class WeightHelper internal constructor(
 }
 
 fun extractDay(date: Long): Long = date - (date % millisInDay)
+
+fun getDateString(date: Long): String {
+    return DateFormat.getDateInstance().format(
+            Date(date)
+    )
+}
+
+fun getTimeString(date: Long): String {
+    return SimpleDateFormat(
+            "HH:mm"
+    ).format(
+            Date(date)
+    )
+}

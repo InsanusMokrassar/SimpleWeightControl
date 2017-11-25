@@ -15,7 +15,7 @@ class DatabaseObserver<T: Any>(
             subscribers.forEach {
                 try {
                     it(db)
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     Log.e(DatabaseObserver::class.java.simpleName, "Can not notify subscriber: $it")
                 }
             }

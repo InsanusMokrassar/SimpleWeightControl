@@ -109,5 +109,29 @@ private class WeightsDaysListIterator(
     }
 
     override fun previousIndex(): Int = index - 1
+}
 
+fun List<WeightData>.calculateAverage(): Float {
+
+    var average = 0F
+    forEach {
+        average += it.weight
+    }
+    average /= size
+
+    return average
+}
+
+fun List<WeightData>.getDate(): Long {
+    var date: Long? = null
+    forEach {
+        val currentDate = extractDay(first().date)
+        if (currentDate != date) {
+            date ?.let {
+                throw IllegalArgumentException("All objects from list must have one day")
+            }
+            date = currentDate
+        }
+    }
+    return date!!
 }
