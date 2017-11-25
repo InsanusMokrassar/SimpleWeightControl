@@ -125,7 +125,7 @@ fun List<WeightData>.calculateAverage(): Float {
 fun List<WeightData>.getDate(): Long {
     var date: Long? = null
     forEach {
-        val currentDate = extractDay(first().date)
+        val currentDate = extractDay(it.date)
         if (currentDate != date) {
             date ?.let {
                 throw IllegalArgumentException("All objects from list must have one day")

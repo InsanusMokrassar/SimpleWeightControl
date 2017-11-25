@@ -1,27 +1,20 @@
 package com.github.insanusmokrassar.simpleweightcontrol.front.fragments
 
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.getColor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.insanusmokrassar.simpleweightcontrol.R
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getDateString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.millisInDay
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysList
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.getDate
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.jjoe64.graphview.GraphView
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlin.collections.ArrayList
@@ -31,68 +24,75 @@ class WeightsChartFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_weights_chart, container, false)
 
         context ?.let {
-            val chart = view.findViewById<LineChart>(R.id.weightsLineChart)
+            val chart = view.findViewById<GraphView>(R.id.weightsChartGraphView)
 
-            chart.isLogEnabled = true
+            chart.viewport.isScrollable = true
 
-            val setArrayList = ArrayList<Entry>()
+            val gridRenderer = chart.gridLabelRenderer
+            gridRenderer.labelFormatter = DateAsXAxisLabelFormatter(it)
 
-            fillDataSet(chart, setArrayList)
+            chart.viewport.isXAxisBoundsManual = true
+            chart.viewport.isYAxisBoundsManual = true
+
+            val series = LineGraphSeries<DataPoint>()
+            series.isDrawDataPoints = true
+            series.dataPointsRadius = resources.getDimension(R.dimen.viewDefaultSmallMargin)
+
+            chart.addSeries(series)
+
+            fillDataSet(chart, series)
 
             it.weightHelper().databaseObserver.subscribe {
-                fillDataSet(chart, setArrayList)
+                fillDataSet(chart, series)
             }
-
-            val set = LineDataSet(setArrayList, "")
-            set.lineWidth = 2.5f
-            set.circleRadius = 5f
-            set.mode = LineDataSet.Mode.CUBIC_BEZIER
-            set.setDrawValues(true)
-            set.valueTextSize = 10f
-
-            set.axisDependency = YAxis.AxisDependency.LEFT
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                set.color = getColor(it, R.color.colorPrimary)
-                set.fillColor = getColor(it, R.color.colorPrimaryDark)
-                set.valueTextColor = getColor(it, R.color.colorAccent)
-                set.setCircleColor(getColor(it, R.color.colorPrimaryDark))
-            } else {
-                set.color = resources.getColor(R.color.colorPrimary)
-                set.fillColor = resources.getColor(R.color.colorPrimaryDark)
-                set.valueTextColor = resources.getColor(R.color.colorAccent)
-                set.setCircleColor(resources.getColor(R.color.colorPrimaryDark))
-            }
-
-            val data = LineData(set)
-            chart.data = data
-
-            chart.xAxis.valueFormatter = DatesAxisValueFormatter()
         }
 
         return view
     }
 
-    private fun fillDataSet(chart: LineChart, setArrayList: ArrayList<Entry>) {
+    private fun fillDataSet(chart: GraphView, series: LineGraphSeries<DataPoint>) {
         context ?.let {
-            setArrayList.clear()
+            val data = ArrayList<DataPoint>()
 
             WeightsDaysList(it.weightHelper()).reversed().forEach {
                 val average = it.calculateAverage()
                 val date = it.getDate()
-                setArrayList.add(Entry(date.toFloat(), average))
+                data.add(DataPoint(date.toDouble(), average.toDouble()))
             }
 
+            val daysInView = it.resources.getInteger(
+                    R.integer.weightDatesChartDaysInView
+            ).let {
+                if (it > data.size) {
+                    data.size
+                } else {
+                    it
+                }
+            }
+            val chartDaysPadding = it.resources.getInteger(
+                    R.integer.weightDatesChartDaysInViewDaysPadding
+            )
+            val chartKgPadding = it.resources.getInteger(
+                    R.integer.weightDatesChartDaysInViewKgPadding
+            )
+            val weights = data.map { it.y }
+
             launch (UI) {
-                chart.notifyDataSetChanged()
-                chart.invalidate()
+                data.lastOrNull() ?.let {
+                    chart.viewport.setMinX(it.x - ((daysInView + chartDaysPadding) * millisInDay))
+                    chart.viewport.setMaxX(it.x + (chartDaysPadding * millisInDay))
+                    weights.min() ?.let {
+                        chart.viewport.setMinY(it - chartKgPadding)
+                    }
+                    weights.max() ?.let {
+                        chart.viewport.setMaxY(it + chartKgPadding)
+                    }
+                    chart.gridLabelRenderer.numHorizontalLabels = resources.getInteger(
+                            R.integer.weightDatesChartNumHorizontalLabels
+                    )
+                }
+                series.resetData(data.toTypedArray())
             }
         }
     }
-}
-
-private class DatesAxisValueFormatter : IAxisValueFormatter {
-    override fun getFormattedValue(value: Float, axis: AxisBase?): String =
-            getDateString(value.toLong())
-
 }

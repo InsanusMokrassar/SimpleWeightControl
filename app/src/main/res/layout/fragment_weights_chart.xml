@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/viewDefaultMediumMargin">
 
-    <com.github.mikephil.charting.charts.LineChart
+    <com.jjoe64.graphview.GraphView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:id="@+id/weightsLineChart"/>
+        android:id="@+id/weightsChartGraphView"/>
 </LinearLayout>

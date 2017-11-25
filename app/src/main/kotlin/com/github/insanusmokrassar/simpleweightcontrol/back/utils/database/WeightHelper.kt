@@ -8,7 +8,8 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-val millisInDay: Long = 24*60*60*1000
+val millisInHour: Long = 60L * 60L * 1000L
+val millisInDay: Long = 24L * millisInHour
 
 private var weightHelper: WeightHelper? = null
 
@@ -44,18 +45,21 @@ class WeightHelper internal constructor(
     }
 }
 
-fun extractDay(date: Long): Long = date - (date % millisInDay)
+//TODO: HELP ME TO FIX IT
+fun extractDay(date: Long): Long =
+        dateFormatInstance.parse(getDateString(date)).time
+
+private val dateFormatInstance = DateFormat.getDateInstance()
+private val timeFormatInstance = SimpleDateFormat("HH:mm")
 
 fun getDateString(date: Long): String {
-    return DateFormat.getDateInstance().format(
+    return dateFormatInstance.format(
             Date(date)
     )
 }
 
 fun getTimeString(date: Long): String {
-    return SimpleDateFormat(
-            "HH:mm"
-    ).format(
+    return timeFormatInstance.format(
             Date(date)
     )
 }
