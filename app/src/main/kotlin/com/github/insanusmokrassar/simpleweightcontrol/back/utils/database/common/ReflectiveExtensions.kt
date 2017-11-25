@@ -4,7 +4,7 @@ import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.instanceParameter
-import kotlin.reflect.memberProperties
+import kotlin.reflect.full.memberProperties
 
 @Target(AnnotationTarget.PROPERTY)
 @MustBeDocumented
@@ -29,37 +29,32 @@ val nativeTypes = listOf(
 /**
  * @return Экземпляр KClass, содержащий данный KCallable объект.
  */
-fun <T> KCallable<T>.intsanceKClass() : KClass<*> {
-    return this.instanceParameter?.type?.classifier as KClass<*>
-}
+fun <T> KCallable<T>.intsanceKClass() : KClass<*> =
+        this.instanceParameter?.type?.classifier as KClass<*>
 
 /**
  * @return true если значение параметра может быть null.
  */
-fun KCallable<*>.isNullable() : Boolean {
-    return this.returnType.isMarkedNullable
-}
+fun KCallable<*>.isNullable() : Boolean =
+        this.returnType.isMarkedNullable
 
 /**
  * @return Экземпляр KClass, возвращаемый KCallable.
  */
-fun KCallable<*>.returnClass() : KClass<*> {
-    return this.returnType.classifier as KClass<*>
-}
+fun KCallable<*>.returnClass() : KClass<*> =
+        this.returnType.classifier as KClass<*>
 
 /**
  * @return true, если возвращает некоторый примитив.
  */
-fun KCallable<*>.isReturnNative() : Boolean {
-    return nativeTypes.contains(this.returnClass())
-}
+fun KCallable<*>.isReturnNative() : Boolean =
+        nativeTypes.contains(this.returnClass())
 
 /**
  * @return true если объект помечен аннотацией [PrimaryKey].
  */
-fun KProperty<*>.isPrimaryField() : Boolean {
-    return this.annotations.firstOrNull { it.annotationClass == PrimaryKey::class } != null
-}
+fun KProperty<*>.isPrimaryField() : Boolean =
+        this.annotations.firstOrNull { it.annotationClass == PrimaryKey::class } != null
 
 /**
  * @return true если объект помечен аннотацией [Autoincrement].
@@ -76,6 +71,5 @@ fun KProperty<*>.isAutoincrement() : Boolean {
 /**
  * @return Список полей класса.
  */
-fun KClass<*>.getVariables() : List<KProperty<*>> {
-    return this.memberProperties.toList()
-}
+fun KClass<*>.getVariables() : List<KProperty<*>> =
+        this.memberProperties.toList()

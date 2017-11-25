@@ -36,7 +36,7 @@ fun Context.createEditWeightDialog(
 
         builder.setNegativeButton(
                 getString(R.string.delete),
-                { dialogInterface, i ->
+                { dialogInterface, _ ->
                     delete(it)
                     dialogInterface.dismiss()
                 }
@@ -64,7 +64,7 @@ fun Context.createEditWeightDialog(
     builder.setPositiveButton(
             android.R.string.ok,
             {
-                dialogInterface, i ->
+                _, _ ->
                 wasError = try {
                     val actualTime = getCalendar(weightDatePicker, weightTimePicker).timeInMillis
                     if (actualTime > System.currentTimeMillis()) {
