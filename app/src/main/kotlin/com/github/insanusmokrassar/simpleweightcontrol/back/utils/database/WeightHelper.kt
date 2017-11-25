@@ -33,7 +33,7 @@ class WeightHelper internal constructor(
     }
 
     fun getDays(): Set<Long> {
-        val days = HashSet<Long>()
+        val days = LinkedHashSet<Long>()
         find().forEach {
             days.add(extractDay(it.date))
         }
