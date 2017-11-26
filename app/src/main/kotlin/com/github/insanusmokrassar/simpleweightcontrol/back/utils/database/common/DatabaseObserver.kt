@@ -11,13 +11,11 @@ class DatabaseObserver<T: Any>(
     private val subscribers = HashSet<(SimpleDatabase<T>) -> Unit>()
 
     override fun onEvent(event: Int, path: String?) {
-        async {
-            subscribers.forEach {
-                try {
-                    it(db)
-                } catch (e: Throwable) {
-                    Log.e(DatabaseObserver::class.java.simpleName, "Can not notify subscriber: $it")
-                }
+        subscribers.forEach {
+            try {
+                it(db)
+            } catch (e: Throwable) {
+                Log.e(DatabaseObserver::class.java.simpleName, "Can not notify subscriber: $it")
             }
         }
     }
