@@ -11,6 +11,7 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weigh
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysList
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.getDate
+import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
@@ -40,25 +41,29 @@ class WeightsChartFragment: Fragment() {
 
             chart.addSeries(series)
 
-            fillDataSet(chart, series)
+            val dataList = WeightsDaysList(it.weightHelper())
 
-            it.weightHelper().databaseObserver.subscribe {
-                fillDataSet(chart, series)
+            fillDataSet(chart, series, dataList)
+
+            dataList.observable.subscribe {
+                fillDataSet(chart, series, it)
             }
         }
 
         return view
     }
 
-    private fun fillDataSet(chart: GraphView, series: LineGraphSeries<DataPoint>) {
+    private fun fillDataSet(chart: GraphView, series: LineGraphSeries<DataPoint>, weights: List<List<WeightData>>) {
         context ?.let {
             val data = ArrayList<DataPoint>()
 
-            WeightsDaysList(it.weightHelper()).reversed().forEach {
+            weights.forEach {
                 val average = it.calculateAverage()
                 val date = it.getDate()
                 data.add(DataPoint(date.toDouble(), average.toDouble()))
             }
+
+            data.sortBy { it.x }
 
             val daysInView = it.resources.getInteger(
                     R.integer.weightDatesChartDaysInView
