@@ -43,7 +43,7 @@ dependencies {
     implementation 'com.android.support:design:27.0.1'
 
     // InsanusMokrassar dependencies
-    implementation ('com.github.insanusmokrassar:IObjectKRealisations:1.7', {
+    implementation ('com.github.insanusmokrassar:IObjectKRealisations:1.7.1', {
         exclude group: 'org.json', module: 'json'
     })
     implementation 'com.github.insanusmokrassar:IObjectK:1.5'
