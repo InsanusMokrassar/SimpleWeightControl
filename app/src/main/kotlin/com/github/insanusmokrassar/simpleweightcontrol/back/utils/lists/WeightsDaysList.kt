@@ -3,27 +3,22 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.extractDay
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 
 class WeightsDaysList(
         private val db: WeightHelper,
         private val firstDay: Long = 0,
         private val lastDay: Long = Long.MAX_VALUE
 ): List<List<WeightData>> {
-    private val subject = PublishSubject.create<WeightsDaysList>()
-    val observable: Observable<WeightsDaysList>
-        get() = subject
-
-    private var cache: List<Long> = db.getDays().filter { it in firstDay..lastDay }
+    private val cache = ArrayList<Long>()
 
     private val updateCache = {
-        cache = db.getDays().filter { it in firstDay..lastDay }
-        subject.onNext(this)
+        cache.clear()
+        cache.addAll(db.getDays().filter { it in firstDay..lastDay })
     }
 
     init {
-        db.commonObserver.subscribe {
+        updateCache()
+        db.databaseObserver.subscribe {
             synchronized(this, updateCache)
         }
     }

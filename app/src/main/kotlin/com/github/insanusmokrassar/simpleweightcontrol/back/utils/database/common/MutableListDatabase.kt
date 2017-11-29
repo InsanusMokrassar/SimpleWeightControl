@@ -10,25 +10,17 @@ open class MutableListDatabase<M: Any> (
         databaseName: String,
         version: Int,
         defaultOrderBy: String? = null
-) : MutableList<M> {
-    private val db = SimpleDatabase(
-            modelClass,
-            context,
-            databaseName,
-            version,
-            defaultOrderBy
-    )
-
+) : SimpleDatabase<M>(modelClass, context, databaseName, version, defaultOrderBy), MutableList<M> {
     override val size: Int
-        get() = db.size().toInt()
+        get() = size().toInt()
 
-    override fun contains(element: M): Boolean = db.find(element) != null
+    override fun contains(element: M): Boolean = find(element) != null
 
     override fun containsAll(elements: Collection<M>): Boolean =
-            db.find(elements.getPrimaryFieldsSearchQuery()).size == elements.size
+            find(elements.getPrimaryFieldsSearchQuery()).size == elements.size
 
     override fun get(index: Int): M =
-            db.findPage(index, 1).firstOrNull() ?: throw IndexOutOfBoundsException("Index: $index, db size: $size")
+            findPage(index, 1, defaultOrderBy).firstOrNull() ?: throw IndexOutOfBoundsException("Index: $index, db size: $size")
 
     override fun indexOf(element: M): Int {
         forEachIndexed { index, m -> if (m == element) return index }
@@ -37,61 +29,63 @@ open class MutableListDatabase<M: Any> (
 
     override fun isEmpty(): Boolean = size == 0
 
-    override fun iterator(): MutableIterator<M> = MutableDatabaseListIterator(this)
+    override fun iterator(): MutableIterator<M> = MutableDatabaseIterator(this)
 
     override fun lastIndexOf(element: M): Int = indexOf(element)
 
-    override fun add(element: M): Boolean = db.insert(element)
+    override fun add(element: M): Boolean = insert(element)
 
     override fun add(index: Int, element: M) {
-        db.beginTransaction()
+        writableDatabase.beginTransaction()
         try {
-            val after = db.find(index, size - index)
-            db.remove(after)
+            val after = find(index, size - index, defaultOrderBy)
+            removeAll(after)
             mutableListOf(element).plus(after).forEach {
-                db.insert(it)
+                insert(it)
             }
-            db.acceptTransaction()
+            writableDatabase.setTransactionSuccessful()
         } catch (e: Exception) {
             Log.e(MutableListDatabase::class.java.simpleName, e.message, e)
-            db.abortTransaction()
         }
+        writableDatabase.endTransaction()
     }
 
     override fun addAll(index: Int, elements: Collection<M>): Boolean {
-        db.beginTransaction()
-        return try {
-            val after = db.find(index, size - index)
+        writableDatabase.beginTransaction()
+        try {
+            val after = find(index, size - index, defaultOrderBy)
             removeAll(after)
             elements.plus(after).forEach {
-                db.insert(it)
+                insert(it)
             }
-            db.acceptTransaction()
-            true
+            writableDatabase.setTransactionSuccessful()
         } catch (e: Exception) {
             Log.e(MutableListDatabase::class.java.simpleName, e.message, e)
-            db.abortTransaction()
-            false
+            writableDatabase.endTransaction()
+            return false
         }
+        writableDatabase.endTransaction()
+        return true
     }
 
     override fun addAll(elements: Collection<M>): Boolean {
-        db.beginTransaction()
-        return try {
+        writableDatabase.beginTransaction()
+        try {
             elements.forEach {
-                db.insert(it)
+                insert(it)
             }
-            db.acceptTransaction()
-            true
+            writableDatabase.setTransactionSuccessful()
         } catch (e: Exception) {
             Log.e(MutableListDatabase::class.java.simpleName, e.message, e)
-            db.abortTransaction()
-            false
+            writableDatabase.endTransaction()
+            return false
         }
+        writableDatabase.endTransaction()
+        return true
     }
 
     override fun clear() {
-        db.remove()
+        remove()
     }
 
     override fun listIterator(): MutableListIterator<M> = MutableDatabaseListIterator(this)
@@ -104,11 +98,8 @@ open class MutableListDatabase<M: Any> (
         return listIterator
     }
 
-    override fun remove(element: M): Boolean =
-            db.remove(elements = element)
-
     override fun removeAll(elements: Collection<M>): Boolean =
-            db.remove(elements)
+            remove(elements.getPrimaryFieldsSearchQuery())
 
     override fun removeAt(index: Int): M {
         val toDelete = get(index)
@@ -126,27 +117,23 @@ open class MutableListDatabase<M: Any> (
 
     override fun set(index: Int, element: M): M {
         val old = get(index)
-        db.update(element, old.getPrimaryFieldsSearchQuery())
+        update(element, old.getPrimaryFieldsSearchQuery())
         return old
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<M> =
-            db.find(limit = buildLimit(fromIndex, toIndex - fromIndex)).toMutableList()
+            find(orderBy = defaultOrderBy, limit = buildLimit(fromIndex, toIndex - fromIndex)).toMutableList()
 
 }
 
-private class MutableDatabaseListIterator<T: Any>(
-        private val dbList: MutableListDatabase<T>,
-        private val pageSize: Int = 20
-): MutableListIterator<T> {
+private open class MutableDatabaseIterator<T: Any>(
+        protected val dbList: MutableListDatabase<T>,
+        protected val pageSize: Int = 20
+): MutableIterator<T> {
 
-    private var currentPage = -1
-    private var currentList = ArrayList<T>(pageSize)
-    private var currentObject: T? = null
-
-    private val index: Int
-        get() = currentPage * pageSize + (pageSize - currentList.size)
-    private var previous: T? = null
+    protected var currentPage = -1
+    protected var currentList = ArrayList<T>(pageSize)
+    protected var currentObject: T? = null
 
     override fun hasNext(): Boolean {
         return if (currentList.isNotEmpty()) {
@@ -158,16 +145,34 @@ private class MutableDatabaseListIterator<T: Any>(
         }
     }
 
+    override fun next(): T {
+        currentObject = currentList.removeAt(0)
+        return currentObject!!
+    }
+
     override fun remove() {
         currentObject ?. let {
             dbList.remove(it)
         }
     }
 
+    protected fun refillList() {
+        currentList.clear()
+        currentList.addAll(dbList.findPage(currentPage, pageSize))
+    }
+}
+
+private class MutableDatabaseListIterator<T: Any>(
+        dbList: MutableListDatabase<T>,
+        pageSize: Int = 20
+): MutableListIterator<T>, MutableDatabaseIterator<T>(dbList, pageSize) {
+    private val index: Int
+        get() = currentPage * pageSize + (pageSize - currentList.size)
+    private var previous: T? = null
+
     override fun next(): T {
         previous = currentObject
-        currentObject = currentList.removeAt(0)
-        return currentObject!!
+        return super.next()
     }
 
     override fun hasPrevious(): Boolean = previous != null
@@ -190,10 +195,5 @@ private class MutableDatabaseListIterator<T: Any>(
     override fun set(element: T) {
         dbList[index] = element
         currentObject = element
-    }
-
-    private fun refillList() {
-        currentList.clear()
-        currentList.addAll(dbList.subList(currentPage, (currentPage + 1) * pageSize))
     }
 }

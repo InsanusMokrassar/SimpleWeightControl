@@ -33,7 +33,7 @@ class DatesOfWeightsFragment : Fragment() {
                     weightsDaysList
             )
 
-            weightsDaysList.observable.subscribe {
+            it.weightHelper().databaseObserver.subscribe {
                 launch (UI) {
                     adapter . notifyDataSetChanged()
                 }

@@ -37,7 +37,7 @@ class WeightViewHolder(
                             }
                         },
                         {
-                            context.weightHelper().remove(it)
+                            WeightHelper(context).remove(it)
                         }
                 ).show()
             }

@@ -96,7 +96,7 @@ fun Any.getPrimaryFieldsSearchQuery(): String {
     )
 }
 
-fun <M: Any> Iterable<M>.getPrimaryFieldsSearchQuery(): String {
+fun <M: Any> Collection<M>.getPrimaryFieldsSearchQuery(): String {
     return joinToString(") OR (", "(", ")") {
         it.getPrimaryFieldsSearchQuery()
     }

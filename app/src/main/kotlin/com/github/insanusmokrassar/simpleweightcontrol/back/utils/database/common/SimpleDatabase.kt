@@ -4,9 +4,6 @@ import android.content.Context
 import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 fun buildLimit(offset: Int? = null, limit: Int = 10): String {
@@ -16,29 +13,22 @@ fun buildLimit(offset: Int? = null, limit: Int = 10): String {
 }
 
 open class SimpleDatabase<M: Any> (
-        private val modelClass: KClass<M>,
+        protected val modelClass: KClass<M>,
         context: Context,
         databaseName: String,
         version: Int,
-        private val defaultOrderBy: String? = null
+        protected val defaultOrderBy: String? = null
 ): SQLiteOpenHelper(context, databaseName, null, version) {
 
-    private val subject = PublishSubject.create<List<M>>()
+    private var observer: DatabaseObserver<M>? = null
 
-    val commonObserver: Observable<List<M>>
-        get() = subject.debounce(200L, TimeUnit.MILLISECONDS)
-
-    val removeObserver = commonObserver.filter {
-        it.firstOrNull() ?.let {
-            find(it) == null
-        } ?: false
-    }
-
-    val upsertObserver = commonObserver.filter {
-        it.firstOrNull() ?.let {
-            find(it) != null
-        } ?: false
-    }
+    val databaseObserver: DatabaseObserver<M>
+        get() {
+            observer ?.let { return it }
+            observer = DatabaseObserver(this)
+            observer!!.startWatching()
+            return observer!!
+        }
 
     override fun onCreate(db: SQLiteDatabase) {
         db.createTableIfNotExist(modelClass)
@@ -51,15 +41,11 @@ open class SimpleDatabase<M: Any> (
     }
 
     open fun insert(value: M): Boolean {
-        val success = writableDatabase.insert(
+        return writableDatabase.insert(
                 modelClass.tableName(),
                 null,
                 value.toContentValues()
         ) > 0
-        if (success) {
-            subject.onNext(listOf(value))
-        }
-        return success
     }
 
     open fun find(
@@ -96,33 +82,29 @@ open class SimpleDatabase<M: Any> (
             where: String? = value.getPrimaryFieldsSearchQuery(),
             onConflict: Int = SQLiteDatabase.CONFLICT_REPLACE
     ): Boolean {
-        val success = writableDatabase.updateWithOnConflict(
+        return writableDatabase.updateWithOnConflict(
                 modelClass.tableName(),
                 value.toContentValues(),
                 where,
                 null,
                 onConflict
         ) > 0
-        if (success) {
-            subject.onNext(listOf(value))
-        }
-        return success
     }
 
-    open fun remove(where: String? = null): Boolean = remove(find(where))
-
-    open fun remove(vararg elements: M): Boolean = remove(listOf(*elements))
-
-    open fun remove(elements: Iterable<M>): Boolean {
-        val success = writableDatabase.delete(
+    open fun remove(where: String? = null): Boolean {
+        return writableDatabase.delete(
                 modelClass.tableName(),
-                elements.getPrimaryFieldsSearchQuery(),
+                where,
                 null
         ) > 0
-        if (success) {
-            subject.onNext(elements.toList())
-        }
-        return success
+    }
+
+    open fun remove(element: M): Boolean {
+        return writableDatabase.delete(
+                modelClass.tableName(),
+                element.getPrimaryFieldsSearchQuery(),
+                null
+        ) > 0
     }
 
     open fun size(where: String? = null): Long {
@@ -132,24 +114,5 @@ open class SimpleDatabase<M: Any> (
                 where,
                 null
         )
-    }
-
-    private val transactionSync = Object()
-    fun beginTransaction() {
-        while(writableDatabase.inTransaction()) {
-            synchronized(transactionSync, { transactionSync.wait() })
-        }
-        writableDatabase.beginTransaction()
-    }
-
-    fun abortTransaction() {
-        writableDatabase.endTransaction()
-        synchronized(transactionSync, { transactionSync.notify() })
-    }
-
-    fun acceptTransaction() {
-        writableDatabase.setTransactionSuccessful()
-        writableDatabase.endTransaction()
-        synchronized(transactionSync, { transactionSync.notify() })
     }
 }

@@ -3,7 +3,6 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 import android.content.Context
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.MutableListDatabase
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -25,7 +24,7 @@ fun Context.weightHelper(): WeightHelper {
 
 class WeightHelper internal constructor(
         c: Context
-): SimpleDatabase<WeightData>(
+): MutableListDatabase<WeightData>(
         WeightData::class,
         c,
         c.getString(R.string.standardDatabaseName),
