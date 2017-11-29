@@ -13,11 +13,11 @@ fun buildLimit(offset: Int? = null, limit: Int = 10): String {
 }
 
 open class SimpleDatabase<M: Any> (
-        protected val modelClass: KClass<M>,
+        private val modelClass: KClass<M>,
         context: Context,
         databaseName: String,
         version: Int,
-        protected val defaultOrderBy: String? = null
+        private val defaultOrderBy: String? = null
 ): SQLiteOpenHelper(context, databaseName, null, version) {
 
     private var observer: DatabaseObserver<M>? = null
@@ -90,19 +90,14 @@ open class SimpleDatabase<M: Any> (
                 onConflict
         ) > 0
     }
+    open fun remove(where: String? = null): Boolean = remove(find(where))
 
-    open fun remove(where: String? = null): Boolean {
+    open fun remove(vararg elements: M): Boolean = remove(listOf(*elements))
+
+    open fun remove(elements: Iterable<M>): Boolean {
         return writableDatabase.delete(
                 modelClass.tableName(),
-                where,
-                null
-        ) > 0
-    }
-
-    open fun remove(element: M): Boolean {
-        return writableDatabase.delete(
-                modelClass.tableName(),
-                element.getPrimaryFieldsSearchQuery(),
+                elements.getPrimaryFieldsSearchQuery(),
                 null
         ) > 0
     }
@@ -114,5 +109,24 @@ open class SimpleDatabase<M: Any> (
                 where,
                 null
         )
+    }
+
+    private val transactionSync = Object()
+    fun beginTransaction() {
+        while(writableDatabase.inTransaction()) {
+            synchronized(transactionSync, { transactionSync.wait() })
+        }
+        writableDatabase.beginTransaction()
+    }
+
+    fun abortTransaction() {
+        writableDatabase.endTransaction()
+        synchronized(transactionSync, { transactionSync.notify() })
+    }
+
+    fun acceptTransaction() {
+        writableDatabase.setTransactionSuccessful()
+        writableDatabase.endTransaction()
+        synchronized(transactionSync, { transactionSync.notify() })
     }
 }
