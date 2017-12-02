@@ -2,7 +2,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.Context
 import com.github.insanusmokrassar.simpleweightcontrol.R
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.MutableListDatabase
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.MutableListDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -30,20 +30,7 @@ class WeightHelper internal constructor(
         c.getString(R.string.standardDatabaseName),
         1,
         "date DESC"
-) {
-    fun getByDay(date: Long): List<WeightData> {
-        val day = extractDay(date)
-        return find("(date >= $day) AND (date < ${day + millisInDay})")
-    }
-
-    fun getDays(): Set<Long> {
-        val days = LinkedHashSet<Long>()
-        find().forEach {
-            days.add(extractDay(it.date))
-        }
-        return days
-    }
-}
+)
 
 //TODO: HELP ME TO FIX IT
 fun extractDay(date: Long): Long =

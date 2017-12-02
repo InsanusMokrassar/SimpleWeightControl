@@ -2,4 +2,5 @@
 <resources>
     <string name="standardSharedPreferencesName">defaultSharedPreferencesName</string>
     <string name="standardDatabaseName">defaultDB</string>
+    <string name="contentProviderAuthority">com.github.insanusmokrassar.CommonSQLiteContentProvider</string>
 </resources>

@@ -1,7 +1,8 @@
-package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common
+package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase
 
 import android.content.Context
 import android.util.Log
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.getPrimaryFieldsSearchQuery
 import kotlin.reflect.KClass
 
 open class MutableListDatabase<M: Any> (
@@ -10,25 +11,23 @@ open class MutableListDatabase<M: Any> (
         databaseName: String,
         version: Int,
         defaultOrderBy: String? = null
-) : MutableList<M> {
-    private val db = SimpleDatabase(
-            modelClass,
-            context,
-            databaseName,
-            version,
-            defaultOrderBy
-    )
-
+) : MutableList<M>, SimpleDatabase<M>(
+        modelClass,
+        context,
+        databaseName,
+        version,
+        defaultOrderBy
+) {
     override val size: Int
-        get() = db.size().toInt()
+        get() = size().toInt()
 
-    override fun contains(element: M): Boolean = db.find(element) != null
+    override fun contains(element: M): Boolean = find(element) != null
 
     override fun containsAll(elements: Collection<M>): Boolean =
-            db.find(elements.getPrimaryFieldsSearchQuery()).size == elements.size
+            find(elements.getPrimaryFieldsSearchQuery()).size == elements.size
 
     override fun get(index: Int): M =
-            db.findPage(index, 1).firstOrNull() ?: throw IndexOutOfBoundsException("Index: $index, db size: $size")
+            findPage(index, 1).firstOrNull() ?: throw IndexOutOfBoundsException("Index: $index, db size: $size")
 
     override fun indexOf(element: M): Int {
         forEachIndexed { index, m -> if (m == element) return index }
@@ -41,57 +40,48 @@ open class MutableListDatabase<M: Any> (
 
     override fun lastIndexOf(element: M): Int = indexOf(element)
 
-    override fun add(element: M): Boolean = db.insert(element)
+    override fun add(element: M): Boolean = insert(element)
 
     override fun add(index: Int, element: M) {
-        db.beginTransaction()
         try {
-            val after = db.find(index, size - index)
-            db.remove(after)
+            val after = find(index, size - index)
+            remove(after)
             mutableListOf(element).plus(after).forEach {
-                db.insert(it)
+                insert(it)
             }
-            db.acceptTransaction()
         } catch (e: Exception) {
             Log.e(MutableListDatabase::class.java.simpleName, e.message, e)
-            db.abortTransaction()
         }
     }
 
     override fun addAll(index: Int, elements: Collection<M>): Boolean {
-        db.beginTransaction()
         return try {
-            val after = db.find(index, size - index)
+            val after = find(index, size - index)
             removeAll(after)
             elements.plus(after).forEach {
-                db.insert(it)
+                insert(it)
             }
-            db.acceptTransaction()
             true
         } catch (e: Exception) {
             Log.e(MutableListDatabase::class.java.simpleName, e.message, e)
-            db.abortTransaction()
             false
         }
     }
 
     override fun addAll(elements: Collection<M>): Boolean {
-        db.beginTransaction()
         return try {
             elements.forEach {
-                db.insert(it)
+                insert(it)
             }
-            db.acceptTransaction()
             true
         } catch (e: Exception) {
             Log.e(MutableListDatabase::class.java.simpleName, e.message, e)
-            db.abortTransaction()
             false
         }
     }
 
     override fun clear() {
-        db.remove()
+        remove()
     }
 
     override fun listIterator(): MutableListIterator<M> = MutableDatabaseListIterator(this)
@@ -105,10 +95,10 @@ open class MutableListDatabase<M: Any> (
     }
 
     override fun remove(element: M): Boolean =
-            db.remove(elements = element)
+            remove(elements = element)
 
     override fun removeAll(elements: Collection<M>): Boolean =
-            db.remove(elements)
+            remove(elements)
 
     override fun removeAt(index: Int): M {
         val toDelete = get(index)
@@ -126,12 +116,12 @@ open class MutableListDatabase<M: Any> (
 
     override fun set(index: Int, element: M): M {
         val old = get(index)
-        db.update(element, old.getPrimaryFieldsSearchQuery())
+        update(element, old.getPrimaryFieldsSearchQuery())
         return old
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<M> =
-            db.find(limit = buildLimit(fromIndex, toIndex - fromIndex)).toMutableList()
+            find(offset = fromIndex, size = toIndex - fromIndex).toMutableList()
 
 }
 

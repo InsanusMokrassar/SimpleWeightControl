@@ -35,7 +35,7 @@ val nativeTypesMap = mapOf(
 )
 
 internal fun KClass<*>.tableName(): String {
-    return java.simpleName
+    return java.canonicalName
 }
 
 fun Map<KProperty<*>, Any>.toContentValues(): ContentValues {
@@ -85,6 +85,9 @@ fun Any.toValuesMap() : Map<KProperty<*>, Any> {
     }
     return values
 }
+
+fun KClass<*>.getPrimaryFields(): List<KProperty<*>> =
+        getVariables().filter { it.isPrimaryField() }
 
 fun Any.getPrimaryFieldsSearchQuery(): String {
     return toValuesMap().filter {

@@ -17,5 +17,10 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:authorities="@string/contentProviderAuthority"
+            android:name=".back.utils.database.common.ContentProvider.CommonSQLiteContentProvider"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 </manifest>

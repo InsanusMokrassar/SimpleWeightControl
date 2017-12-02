@@ -13,8 +13,6 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsD
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.WeightDateHolderAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 
 class DatesOfWeightsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,9 +31,9 @@ class DatesOfWeightsFragment : Fragment() {
                     weightsDaysList
             )
 
-            it.weightHelper().databaseObserver.subscribe {
-                launch (UI) {
-                    adapter . notifyDataSetChanged()
+            weightsDaysList.observable.subscribe {
+                activity ?. runOnUiThread {
+                    adapter.notifyDataSetChanged()
                 }
             }
 

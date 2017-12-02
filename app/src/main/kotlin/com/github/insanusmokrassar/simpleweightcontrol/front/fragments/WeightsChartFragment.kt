@@ -40,21 +40,27 @@ class WeightsChartFragment: Fragment() {
 
             chart.addSeries(series)
 
-            fillDataSet(chart, series)
+            val list = WeightsDaysList(it.weightHelper())
 
-            it.weightHelper().databaseObserver.subscribe {
-                fillDataSet(chart, series)
+            fillDataSet(chart, series, list)
+
+            list.observable.subscribe {
+                fillDataSet(chart, series, it)
             }
         }
 
         return view
     }
 
-    private fun fillDataSet(chart: GraphView, series: LineGraphSeries<DataPoint>) {
+    private fun fillDataSet(
+            chart: GraphView,
+            series: LineGraphSeries<DataPoint>,
+            list: WeightsDaysList
+    ) {
         context ?.let {
             val data = ArrayList<DataPoint>()
 
-            WeightsDaysList(it.weightHelper()).reversed().forEach {
+            list.filter { it.isNotEmpty() }.forEach {
                 val average = it.calculateAverage()
                 val date = it.getDate()
                 data.add(DataPoint(date.toDouble(), average.toDouble()))
@@ -91,6 +97,7 @@ class WeightsChartFragment: Fragment() {
                             R.integer.weightDatesChartNumHorizontalLabels
                     )
                 }
+                data.sortBy { it.x }
                 series.resetData(data.toTypedArray())
             }
         }
