@@ -10,7 +10,7 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.commo
 import kotlin.reflect.KClass
 
 internal class KClassSQLiteOpenHelper<M: Any> (
-        val modelClass: KClass<M>,
+        private val modelClass: KClass<M>,
         context: Context,
         databaseName: String,
         version: Int

@@ -34,14 +34,12 @@ val nativeTypesMap = mapOf(
         )
 )
 
-internal fun KClass<*>.tableName(): String {
-    return java.canonicalName
-}
+internal fun KClass<*>.tableName(): String = java.simpleName
 
 fun Map<KProperty<*>, Any>.toContentValues(): ContentValues {
     val cv = ContentValues()
     keys.forEach {
-        val prop = it
+        prop ->
         val value = get(prop)!!
         when(value::class) {
             Boolean::class -> cv.put(prop.name, value as Boolean)

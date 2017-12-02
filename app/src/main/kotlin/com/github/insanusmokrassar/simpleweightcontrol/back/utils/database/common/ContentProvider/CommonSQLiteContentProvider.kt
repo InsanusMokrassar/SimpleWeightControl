@@ -13,13 +13,18 @@ import android.util.Log
 import kotlin.reflect.KClass
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.TAG
 
-fun Uri.center(): String = pathSegments[0]
-fun Uri.database(): String = pathSegments[1]
-fun Uri.modelFullClasspath(): String = pathSegments[2]
-fun Uri.version(): Int = pathSegments[3].toInt()
+fun Uri.center(): String = authority
+fun Uri.database(): String = pathSegments[0]
+fun Uri.modelClass(): KClass<*> = Class.forName(pathSegments[1]).kotlin
+fun Uri.version(): Int = pathSegments[2].toInt()
 fun Uri.rowId(): String? =
         try {
-            pathSegments[4]
+            val rowId = pathSegments[3]
+            if (rowId != "null" && rowId.toLong() > 0) {
+                rowId
+            } else {
+                null
+            }
         } catch (e: IndexOutOfBoundsException) {
             null
         }
@@ -27,47 +32,52 @@ fun Uri.rowId(): String? =
 fun providerUri(
         center: String,
         database: String,
-        modelClass: String?,
+        modelClass: KClass<*>,
         version: Int = 1,
         rowId: Long? = null
-): Uri = Uri.parse("content://$center/$database/$modelClass/$version${rowId ?.let { "/$it" }}")
+): Uri = Uri.parse(
+        "content://$center/$database/${modelClass.java.canonicalName}/$version${rowId ?.let { "/$it" } ?: ""}"
+)
 
 class CommonSQLiteContentProvider : ContentProvider() {
+    private val openHelpers = HashMap<KClass<*>, KClassSQLiteOpenHelper<*>>()
+
     override fun onCreate(): Boolean {
         Log.i(TAG(), "Created")
         return true
     }
 
-    private val openHelpers = HashMap<KClass<*>, KClassSQLiteOpenHelper<*>>()
-
     private fun getHelper(
             uri: Uri
     ): KClassSQLiteOpenHelper<*> {
-        val modelClass = Class.forName(uri.modelFullClasspath()).kotlin
-        val databaseName = uri.database()
-        val version = uri.version()
+        val modelClass = uri.modelClass()
         return openHelpers[modelClass] ?: {
             openHelpers.put(
                     modelClass,
                     KClassSQLiteOpenHelper(
                             modelClass,
                             context,
-                            databaseName,
-                            version
+                            uri.database(),
+                            uri.version()
                     )
             )
             getHelper(uri)
         }()
     }
 
-    override fun insert(uri: Uri, cv: ContentValues): Uri =
-            providerUri(
-                    uri.center(),
-                    uri.database(),
-                    uri.modelFullClasspath(),
-                    uri.version(),
-                    getHelper(uri).insert(cv)
-            )
+    override fun insert(uri: Uri, cv: ContentValues): Uri {
+        val uriRow = providerUri(
+                uri.center(),
+                uri.database(),
+                uri.modelClass(),
+                uri.version(),
+                getHelper(uri).insert(cv)
+        )
+        uri.rowId() ?.let {
+            notifyDataChanged(uri)
+        }
+        return uriRow
+    }
 
     override fun query(
             uri: Uri,
@@ -102,7 +112,7 @@ class CommonSQLiteContentProvider : ContentProvider() {
                     it.getString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER)
             )
         }
-        return super.query(uri, projection, queryArgs, cancellationSignal)
+        return getHelper(uri).find(projection)
     }
 
     override fun update(
@@ -110,15 +120,33 @@ class CommonSQLiteContentProvider : ContentProvider() {
             cv: ContentValues,
             selection: String?,
             selectionArgs: Array<String>?
-    ): Int = getHelper(uri).update(cv, selection, selectionArgs)
+    ): Int {
+        val result = getHelper(uri).update(cv, selection, selectionArgs)
+        if (result > 0) {
+            notifyDataChanged(uri)
+        }
+        return result
+    }
 
     override fun delete(
             uri: Uri,
             selection: String?,
             selectionArgs: Array<String>?
-    ): Int = getHelper(uri).remove(selection, selectionArgs)
+    ): Int {
+        val result = getHelper(uri).remove(selection, selectionArgs)
+        if (result > 0) {
+            notifyDataChanged(uri)
+        }
+        return result
+    }
 
     override fun getType(uri: Uri): String =
-            "vnd.android.cursor.${uri.rowId() ?.let { "item" } ?: "dir" }/${uri.database()}.${uri.modelFullClasspath()}"
+            "vnd.android.cursor.${
+            uri.rowId() ?.let {
+                "item"
+            } ?: "dir"}/${uri.database()}.${uri.modelClass()}.${uri.version()}"
 
+    private fun notifyDataChanged(uri: Uri) {
+        context.contentResolver.notifyChange(uri, null)
+    }
 }
