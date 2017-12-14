@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-    <fragment
+    android:layout_height="match_parent">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        class="com.github.insanusmokrassar.simpleweightcontrol.front.fragments.WeightsChartFragment"
-        android:id="@+id/weightsChartFragment"/>
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        class="com.github.insanusmokrassar.simpleweightcontrol.front.fragments.DatesOfWeightsFragment"
-        android:id="@+id/datesOfWeightsFragment"/>
-</LinearLayout>
+        android:orientation="vertical">
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            class="com.github.insanusmokrassar.simpleweightcontrol.front.fragments.WeightsChartFragment"
+            android:id="@+id/weightsChartFragment"/>
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.github.insanusmokrassar.simpleweightcontrol.front.fragments.DatesOfWeightsFragment"
+            android:id="@+id/datesOfWeightsFragment"/>
+    </LinearLayout>
+</ScrollView>
