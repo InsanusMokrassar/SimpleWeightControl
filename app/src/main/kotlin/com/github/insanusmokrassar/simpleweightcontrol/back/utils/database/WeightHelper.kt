@@ -5,7 +5,6 @@ import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 val millisInHour: Long = 60L * 60L * 1000L

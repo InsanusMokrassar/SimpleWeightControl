@@ -10,7 +10,6 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculat
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
-import kotlin.collections.ArrayList
 
 class WeightDateHolderAdapter(
         inflater: LayoutInflater,

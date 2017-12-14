@@ -11,7 +11,6 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.milli
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysMap
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.getDate
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
@@ -19,7 +18,6 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import kotlin.collections.ArrayList
 
 class WeightsChartFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

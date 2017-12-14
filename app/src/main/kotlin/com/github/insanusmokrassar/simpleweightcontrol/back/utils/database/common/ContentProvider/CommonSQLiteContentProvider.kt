@@ -10,8 +10,8 @@ import android.os.Bundle
 import android.os.CancellationSignal
 import android.support.annotation.RequiresApi
 import android.util.Log
-import kotlin.reflect.KClass
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.TAG
+import kotlin.reflect.KClass
 
 fun Uri.center(): String = authority
 fun Uri.database(): String = pathSegments[0]

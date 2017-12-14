@@ -1,8 +1,6 @@
 package com.github.insanusmokrassar.simpleweightcontrol.front.extensions
 
 import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.Context
 import android.os.Build
 import android.view.LayoutInflater

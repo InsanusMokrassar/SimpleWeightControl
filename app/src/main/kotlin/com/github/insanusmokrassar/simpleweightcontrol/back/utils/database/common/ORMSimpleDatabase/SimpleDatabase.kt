@@ -3,9 +3,12 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.comm
 import android.content.Context
 import android.util.Log
 import com.github.insanusmokrassar.simpleweightcontrol.R
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.*
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ContentProvider.CommonSQLiteContentObserver
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ContentProvider.providerUri
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.extractAll
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.getPrimaryFields
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.getPrimaryFieldsSearchQuery
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.toContentValues
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.TAG
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject

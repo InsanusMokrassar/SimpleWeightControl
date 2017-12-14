@@ -4,15 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.github.insanusmokrassar.simpleweightcontrol.R
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getTimeString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.createEditWeightDialog
 import kotlinx.coroutines.experimental.async
-import java.text.SimpleDateFormat
-import java.util.*
 
 class WeightViewHolder(
         inflater: LayoutInflater,

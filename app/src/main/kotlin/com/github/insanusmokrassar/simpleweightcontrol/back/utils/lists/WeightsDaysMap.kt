@@ -4,7 +4,7 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.commo
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.extractDay
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.millisInDay
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
-import java.util.LinkedHashSet
+import java.util.*
 
 private fun SimpleDatabase<WeightData>.getByDay(date: Long): List<WeightData> {
     val day = extractDay(date)
