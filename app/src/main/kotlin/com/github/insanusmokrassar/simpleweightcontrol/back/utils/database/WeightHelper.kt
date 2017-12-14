@@ -2,7 +2,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.Context
 import com.github.insanusmokrassar.simpleweightcontrol.R
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.MutableListDatabase
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -24,7 +24,7 @@ fun Context.weightHelper(): WeightHelper {
 
 class WeightHelper internal constructor(
         c: Context
-): MutableListDatabase<WeightData>(
+): SimpleDatabase<WeightData>(
         WeightData::class,
         c,
         c.getString(R.string.standardDatabaseName),
@@ -32,6 +32,7 @@ class WeightHelper internal constructor(
         "date DESC"
 )
 
+private val offsetInMillis = Calendar.getInstance().timeZone.rawOffset * millisInHour
 //TODO: HELP ME TO FIX IT
 fun extractDay(date: Long): Long =
         dateFormatInstance.parse(getDateString(date)).time

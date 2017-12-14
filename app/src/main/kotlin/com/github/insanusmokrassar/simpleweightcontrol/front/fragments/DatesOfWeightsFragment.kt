@@ -8,34 +8,42 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.insanusmokrassar.simpleweightcontrol.R
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysList
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysMap
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.WeightDateHolderAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 class DatesOfWeightsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_dates_of_weights, container, false)
 
         context ?. let {
-            val weightsDaysList = WeightsDaysList(it.weightHelper())
+            val weightsDaysMap = WeightsDaysMap()
+            val list = ArrayList<Pair<Long, List<WeightData>>>()
 
-            val adapter: RecyclerViewAdapter<List<WeightData>> = RecyclerViewAdapter(
+            val adapter = RecyclerViewAdapter(
                     {
-                        parent: ViewGroup,
-                        _: Int,
-                        _: RecyclerViewAdapter<List<WeightData>> ->
+                        parent, _, _ ->
                         WeightDateHolderAdapter(layoutInflater, parent)
                     },
-                    weightsDaysList
+                    list
             )
 
-            weightsDaysList.observable.subscribe {
-                activity ?. runOnUiThread {
+            val update: (SimpleDatabase<WeightData>) -> Unit = {
+                weightsDaysMap.refresh(it.find())
+                list.clear()
+                list.addAll(weightsDaysMap.pairs().sortedByDescending { it.first })
+                launch (UI) {
                     adapter.notifyDataSetChanged()
                 }
             }
+
+            update(it.weightHelper())
+            it.weightHelper().observable.subscribe(update)
 
             adapter.emptyView = view.findViewById(R.id.emptyWeightListView)
 

@@ -42,6 +42,17 @@ fun providerUri(
 class CommonSQLiteContentProvider : ContentProvider() {
     private val openHelpers = HashMap<KClass<*>, KClassSQLiteOpenHelper<*>>()
 
+    private val observer = CommonSQLiteContentObserver {
+        synchronized(this, {
+            it ?.let {
+                openHelpers[it.modelClass()] ?.let {
+                    it.writableDatabase.close()
+                    it.readableDatabase.close()
+                }
+            }
+        })
+    }
+
     override fun onCreate(): Boolean {
         Log.i(TAG(), "Created")
         return true
@@ -61,6 +72,11 @@ class CommonSQLiteContentProvider : ContentProvider() {
                             uri.version()
                     )
             )
+            context ?. contentResolver ?. registerContentObserver(
+                    uri,
+                    false,
+                    observer
+            )
             getHelper(uri)
         }()
     }
@@ -73,7 +89,7 @@ class CommonSQLiteContentProvider : ContentProvider() {
                 uri.version(),
                 getHelper(uri).insert(cv)
         )
-        uri.rowId() ?.let {
+        uriRow.rowId() ?.let {
             notifyDataChanged(uri)
         }
         return uriRow

@@ -7,22 +7,25 @@ import android.widget.TextView
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getDateString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.getDate
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
-import java.text.DateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 class WeightDateHolderAdapter(
         inflater: LayoutInflater,
         container: ViewGroup
-) : AbstractViewHolder<List<WeightData>>({
+) : AbstractViewHolder<Pair<Long, List<WeightData>>>({
     val view = inflater.inflate(R.layout.item_weight_date, container, false)
     view.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).setHasFixedSize(true)
     view
 }) {
+    private var currentPair: Pair<Long, List<WeightData>>? = null
+        set(value) {
+            field = value
+            currentList.clear()
+            value ?. second ?.let { currentList.addAll(it) }
+        }
     private val currentList = ArrayList<WeightData>()
     private val adapter = RecyclerViewAdapter(
             {
@@ -41,19 +44,19 @@ class WeightDateHolderAdapter(
         itemView.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).adapter = adapter
     }
 
-    override fun refreshItem(item: List<WeightData>) {
-        currentList.clear()
-        currentList.addAll(item)
+    override fun refreshItem(item: Pair<Long, List<WeightData>>) {
+        currentPair = item
         if (currentList.isNotEmpty()) {
-            itemView.findViewById<TextView>(R.id.weightDateTextView).text = getDateString(
-                    currentList.getDate()
-            )
+            currentPair ?.let {
+                itemView.findViewById<TextView>(R.id.weightDateTextView).text = getDateString(
+                        it.first
+                )
 
-
-            itemView.findViewById<TextView>(R.id.averageWeightTextView).text = String.format(
-                    "%.1f",
-                    currentList.calculateAverage()
-            )
+                itemView.findViewById<TextView>(R.id.averageWeightTextView).text = String.format(
+                        "%.1f",
+                        it.second.calculateAverage()
+                )
+            }
         }
         adapter.notifyDataSetChanged()
     }

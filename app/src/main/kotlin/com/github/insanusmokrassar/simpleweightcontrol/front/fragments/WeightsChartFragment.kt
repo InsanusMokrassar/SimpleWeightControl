@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.insanusmokrassar.simpleweightcontrol.R
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.millisInDay
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysList
+import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.WeightsDaysMap
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.getDate
+import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
@@ -40,13 +42,15 @@ class WeightsChartFragment: Fragment() {
 
             chart.addSeries(series)
 
-            val list = WeightsDaysList(it.weightHelper())
+            val weightsDaysMap = WeightsDaysMap()
 
-            fillDataSet(chart, series, list)
-
-            list.observable.subscribe {
-                fillDataSet(chart, series, it)
+            val update: (SimpleDatabase<WeightData>) -> Unit = {
+                weightsDaysMap.refresh(it.find())
+                fillDataSet(chart, series, weightsDaysMap)
             }
+
+            update(it.weightHelper())
+            it.weightHelper().observable.subscribe(update)
         }
 
         return view
@@ -55,15 +59,14 @@ class WeightsChartFragment: Fragment() {
     private fun fillDataSet(
             chart: GraphView,
             series: LineGraphSeries<DataPoint>,
-            list: WeightsDaysList
+            map: WeightsDaysMap
     ) {
         context ?.let {
             val data = ArrayList<DataPoint>()
 
-            list.filter { it.isNotEmpty() }.forEach {
-                val average = it.calculateAverage()
-                val date = it.getDate()
-                data.add(DataPoint(date.toDouble(), average.toDouble()))
+            map.filter { it.value.isNotEmpty() }.forEach {
+                val average = it.value.calculateAverage()
+                data.add(DataPoint(it.key.toDouble(), average.toDouble()))
             }
 
             val daysInView = it.resources.getInteger(
@@ -81,23 +84,32 @@ class WeightsChartFragment: Fragment() {
             val chartKgPadding = it.resources.getInteger(
                     R.integer.weightDatesChartDaysInViewKgPadding
             )
+
             val weights = data.map { it.y }
 
+            val minDate = map.keys.min()
+            val maxDate = map.keys.max()
+            val minWeight = weights.min()
+            val maxWeight = weights.max()
+
+            data.sortBy { it.x }
+
             launch (UI) {
-                data.lastOrNull() ?.let {
-                    chart.viewport.setMinX(it.x - ((daysInView + chartDaysPadding) * millisInDay))
-                    chart.viewport.setMaxX(it.x + (chartDaysPadding * millisInDay))
-                    weights.min() ?.let {
-                        chart.viewport.setMinY(it - chartKgPadding)
-                    }
-                    weights.max() ?.let {
-                        chart.viewport.setMaxY(it + chartKgPadding)
-                    }
-                    chart.gridLabelRenderer.numHorizontalLabels = resources.getInteger(
-                            R.integer.weightDatesChartNumHorizontalLabels
-                    )
+                minDate ?.toDouble() ?.let {
+                    chart.viewport.setMinX(it - (daysInView + chartDaysPadding) * millisInDay)
                 }
-                data.sortBy { it.x }
+                maxDate ?.toDouble() ?.let {
+                    chart.viewport.setMaxX(it + chartDaysPadding * millisInDay)
+                }
+                minWeight ?.let {
+                    chart.viewport.setMinY(it - chartKgPadding)
+                }
+                maxWeight ?.let {
+                    chart.viewport.setMaxY(it + chartKgPadding)
+                }
+                chart.gridLabelRenderer.numHorizontalLabels = resources.getInteger(
+                        R.integer.weightDatesChartNumHorizontalLabels
+                )
                 series.resetData(data.toTypedArray())
             }
         }
