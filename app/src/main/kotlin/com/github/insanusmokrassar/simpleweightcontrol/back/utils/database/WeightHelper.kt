@@ -37,10 +37,17 @@ fun extractDay(date: Long): Long =
         dateFormatInstance.parse(getDateString(date)).time
 
 private val dateFormatInstance = DateFormat.getDateInstance()
+private val dateFormatShortInstance = DateFormat.getDateInstance(DateFormat.SHORT)
 private val timeFormatInstance = DateFormat.getTimeInstance(DateFormat.SHORT)
 
 fun getDateString(date: Long): String {
     return dateFormatInstance.format(
+            Date(date)
+    )
+}
+
+fun getShortDateString(date: Long): String {
+    return dateFormatShortInstance.format(
             Date(date)
     )
 }
