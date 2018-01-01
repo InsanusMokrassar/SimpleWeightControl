@@ -5,9 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import com.github.insanusmokrassar.androidutils.common.extensions.TAG
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
-import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.TAG
 import com.github.insanusmokrassar.simpleweightcontrol.front.extensions.createEditWeightDialog
 
 class HomeActivity: AppCompatActivity() {

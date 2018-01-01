@@ -4,21 +4,24 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import com.github.insanusmokrassar.androidutils.front.utils.adapters.RecyclerView.AbstractStandardViewHolder
+import com.github.insanusmokrassar.androidutils.front.utils.adapters.RecyclerView.RecyclerViewAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getDateString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
-import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.AbstractViewHolder
-import com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView.common.RecyclerViewAdapter
 
 class WeightDateHolderAdapter(
         inflater: LayoutInflater,
         container: ViewGroup
-) : AbstractViewHolder<Pair<Long, List<WeightData>>>({
-    val view = inflater.inflate(R.layout.item_weight_date, container, false)
-    view.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).setHasFixedSize(true)
-    view
-}) {
+) : AbstractStandardViewHolder<Pair<Long, List<WeightData>>>(
+        inflater,
+        container,
+        R.layout.item_weight_date,
+        {
+            it.findViewById<RecyclerView>(R.id.weightsItemRecyclerView).setHasFixedSize(true)
+        }
+) {
     private var currentPair: Pair<Long, List<WeightData>>? = null
         set(value) {
             field = value

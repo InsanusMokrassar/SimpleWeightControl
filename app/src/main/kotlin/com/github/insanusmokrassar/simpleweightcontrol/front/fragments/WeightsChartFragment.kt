@@ -1,13 +1,13 @@
 package com.github.insanusmokrassar.simpleweightcontrol.front.fragments
 
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.R
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getShortDateString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.millisInDay
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
@@ -16,12 +16,13 @@ import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculat
 import com.github.insanusmokrassar.simpleweightcontrol.common.extensions.spToDp
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 
 class WeightsChartFragment: Fragment() {
@@ -45,21 +46,6 @@ class WeightsChartFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_weights_chart, container, false)
 
         context ?.let {
-//            val chart = view.findViewById<GraphView>(R.id.weightsChartGraphView)
-//
-//            chart.viewport.isScrollable = true
-//
-//            val gridRenderer = chart.gridLabelRenderer
-//            gridRenderer.labelFormatter = DateAsXAxisLabelFormatter(it)
-//
-//            chart.viewport.isXAxisBoundsManual = true
-//            chart.viewport.isYAxisBoundsManual = true
-//
-//            val series = LineGraphSeries<DataPoint>()
-//            series.isDrawDataPoints = true
-//            series.dataPointsRadius = resources.getDimension(R.dimen.viewDefaultSmallMargin)
-//
-//            chart.addSeries(series)
 
             val chart = view.findViewById<LineChart>(R.id.weightsChartLineChart)
             val data = LineData()
@@ -74,7 +60,7 @@ class WeightsChartFragment: Fragment() {
             chart.setDrawGridBackground(false)
 
             chart.xAxis.valueFormatter = IAxisValueFormatter {
-                value, axis ->
+                value, _ ->
                 getShortDateString(value.toLong())
             }
             chart.xAxis.granularity = millisInDay.toFloat()
@@ -85,17 +71,11 @@ class WeightsChartFragment: Fragment() {
             set.valueTextSize = it.spToDp(resources.getDimension(R.dimen.textDefaultSmallSize))
             set.setDrawValues(true)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                activity ?.let {
-                    activity ->
-                    set.valueTextColor = activity.getColor(R.color.colorPrimary)
-                    set.setCircleColor( activity.getColor(R.color.colorAccent))
-                    set.color = activity.getColor(R.color.colorPrimaryDark)
-                }
-            } else {
-                set.valueTextColor = resources.getColor(R.color.colorPrimary)
-                set.setCircleColor(resources.getColor(R.color.colorAccent))
-                set.color = resources.getColor(R.color.colorPrimaryDark)
+            context ?.let {
+                context ->
+                set.valueTextColor = ContextCompat.getColor(context, R.color.colorPrimary)
+                set.setCircleColor(ContextCompat.getColor(context, R.color.colorAccent))
+                set.color = ContextCompat.getColor(context, R.color.colorPrimaryDark)
             }
 
             data.addDataSet(set)
@@ -162,21 +142,15 @@ class WeightsChartFragment: Fragment() {
 
             map.keys.max() ?. toFloat() ?.let { chart.moveViewToX(it) }
 
-            chart.animateX(
-                    map.size * resources.getInteger(R.integer.weightChartItemDrawTime)
-            )
+            launch (UI) {
+                chart.animateX(
+                        map.size * resources.getInteger(R.integer.weightChartItemDrawTime)
+                )
 
-            chart.data ?. notifyDataChanged()
-            chart.notifyDataSetChanged()
-            chart.postInvalidate()
-//
-//
-//            data.sortBy { it.x }
-//
-//            launch (UI) {
-//                chart.gridLabelRenderer.numHorizontalLabels =
-//                series.resetData(data.toTypedArray())
-//            }
+                chart.data ?. notifyDataChanged()
+                chart.notifyDataSetChanged()
+                chart.invalidate()
+            }
         }
     }
 }

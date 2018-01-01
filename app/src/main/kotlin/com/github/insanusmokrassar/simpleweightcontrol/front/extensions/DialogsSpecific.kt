@@ -1,13 +1,14 @@
 package com.github.insanusmokrassar.simpleweightcontrol.front.extensions
 
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TimePicker
 import android.widget.Toast
+import com.github.insanusmokrassar.androidutils.front.helpers.setDismissChecker
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
 import java.util.*

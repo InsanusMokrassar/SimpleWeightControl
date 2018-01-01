@@ -1,6 +1,6 @@
 package com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists
 
-import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.common.ORMSimpleDatabase.SimpleDatabase
+import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.extractDay
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.millisInDay
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
