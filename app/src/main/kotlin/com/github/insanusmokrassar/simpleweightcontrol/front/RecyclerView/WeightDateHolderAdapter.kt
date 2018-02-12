@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import com.github.insanusmokrassar.androidutils.front.utils.adapters.RecyclerView.AbstractStandardViewHolder
-import com.github.insanusmokrassar.androidutils.front.utils.adapters.RecyclerView.RecyclerViewAdapter
+import com.github.insanusmokrassar.RecyclerViewAdapter.AbstractStandardViewHolder
+import com.github.insanusmokrassar.RecyclerViewAdapter.RecyclerViewAdapter
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getDateString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.lists.calculateAverage

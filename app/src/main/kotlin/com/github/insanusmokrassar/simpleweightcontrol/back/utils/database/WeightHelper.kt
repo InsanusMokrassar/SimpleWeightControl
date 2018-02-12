@@ -2,16 +2,14 @@ package com.github.insanusmokrassar.simpleweightcontrol.back.utils.database
 
 import android.content.Context
 import android.util.Log
-import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.ContentProvider.CommonSQLiteContentObserver
-import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.ORMSimpleDatabase.SimpleDatabase
-import com.github.insanusmokrassar.androidutils.common.extensions.TAG
+import com.github.insanusmokrassar.CommonAndroidUtils.common.extensions.TAG
+import com.github.insanusmokrassar.SimpleAndroidORM.ContentProvider.CommonSQLiteContentObserver
+import com.github.insanusmokrassar.SimpleAndroidORM.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.common.models.WeightData
-import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.text.DateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 val millisInHour: Long = 60L * 60L * 1000L
 val millisInDay: Long = 24L * millisInHour
@@ -39,11 +37,6 @@ class WeightHelper internal constructor(
 
     private val subject = PublishSubject.create<WeightHelper>()
 
-    val observable: Observable<WeightHelper> = subject.debounce(
-            200L,
-            TimeUnit.MILLISECONDS
-    )
-
     private val providerObserver = CommonSQLiteContentObserver {
         if (this.providerUri == it) {
             subject.onNext(this)
@@ -58,7 +51,7 @@ class WeightHelper internal constructor(
         )
 
         observable.subscribe {
-            Log.i(this.TAG(), "Changed: $it")
+            Log.i(TAG(), "Changed: $it")
         }
     }
 }

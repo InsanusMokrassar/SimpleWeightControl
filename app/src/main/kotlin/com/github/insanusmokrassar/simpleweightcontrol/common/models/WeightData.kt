@@ -1,8 +1,8 @@
 package com.github.insanusmokrassar.simpleweightcontrol.common.models
 
 import android.util.Log
-import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.Autoincrement
-import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.PrimaryKey
+import com.github.insanusmokrassar.SimpleAndroidORM.Autoincrement
+import com.github.insanusmokrassar.SimpleAndroidORM.PrimaryKey
 import java.text.SimpleDateFormat
 import java.util.*
 

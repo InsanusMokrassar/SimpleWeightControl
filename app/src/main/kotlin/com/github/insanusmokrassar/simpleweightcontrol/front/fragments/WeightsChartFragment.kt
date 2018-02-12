@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.ORMSimpleDatabase.SimpleDatabase
+import com.github.insanusmokrassar.SimpleAndroidORM.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getShortDateString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.millisInDay
@@ -43,13 +43,9 @@ class WeightsChartFragment: Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_weights_chart, container, false)
-
-        context ?.let {
-
-            val chart = view.findViewById<LineChart>(R.id.weightsChartLineChart)
+        return inflater.inflate(R.layout.fragment_weights_chart, container, false).apply {
+            val chart = findViewById<LineChart>(R.id.weightsChartLineChart)
             val data = LineData()
-            val set = LineDataSet(null, "Weights data")
 
             chart.data = data
 
@@ -65,21 +61,6 @@ class WeightsChartFragment: Fragment() {
             }
             chart.xAxis.granularity = millisInDay.toFloat()
 
-            set.axisDependency = YAxis.AxisDependency.LEFT
-            set.lineWidth = resources.getDimension(R.dimen.viewDefaultExtraSmallMargin) / 2
-            set.circleRadius = resources.getDimension(R.dimen.viewDefaultExtraSmallMargin)
-            set.valueTextSize = it.spToDp(resources.getDimension(R.dimen.textDefaultSmallSize))
-            set.setDrawValues(true)
-
-            context ?.let {
-                context ->
-                set.valueTextColor = ContextCompat.getColor(context, R.color.colorPrimary)
-                set.setCircleColor(ContextCompat.getColor(context, R.color.colorAccent))
-                set.color = ContextCompat.getColor(context, R.color.colorPrimaryDark)
-            }
-
-            data.addDataSet(set)
-
             val weightsDaysMap = WeightsDaysMap()
 
             val update: (SimpleDatabase<WeightData>) -> Unit = {
@@ -87,66 +68,80 @@ class WeightsChartFragment: Fragment() {
                 fillDataSet(chart, weightsDaysMap)
             }
 
-            update(it.weightHelper())
-            it.weightHelper().observable.subscribe(update)
+            update(context.weightHelper())
+            context.weightHelper().observable.subscribe(update)
         }
-
-        return view
     }
 
     private fun fillDataSet(
             chart: LineChart,
             map: WeightsDaysMap
     ) {
-        context ?.let {
-            val weights = ArrayList<Float>()
+        try {
+            context?.let {
+                val weights = ArrayList<Float>()
 
-            chart.data ?. dataSets ?. firstOrNull() ?.let {
-                set ->
-                set.clear()
-                map.toSortedMap().forEach {
-                    val average = it.value.calculateAverage()
-                    weights.add(average)
-                    set.addEntry(Entry(it.key.toFloat(), average))
-                }
-            }
-
-            val daysInView = it.resources.getInteger(
-                    R.integer.weightDatesChartDaysInView
-            )/*.let {
-                if (it > map.size) {
-                    map.size
+                val dataset = if (map.isNotEmpty()) {
+                    map.toSortedMap().map {
+                        val average = it.value.calculateAverage()
+                        weights.add(average)
+                        Entry(it.key.toFloat(), average)
+                    }.let { data ->
+                        LineDataSet(data, "Weights data").apply {
+                            axisDependency = YAxis.AxisDependency.LEFT
+                            lineWidth = resources.getDimension(R.dimen.viewDefaultExtraSmallMargin) / 2
+                            circleRadius = resources.getDimension(R.dimen.viewDefaultExtraSmallMargin)
+                            valueTextSize = chart.context.spToDp(resources.getDimension(R.dimen.textDefaultSmallSize))
+                            setDrawValues(true)
+                            valueTextColor = ContextCompat.getColor(chart.context, R.color.colorPrimary)
+                            setCircleColor(ContextCompat.getColor(chart.context, R.color.colorAccent))
+                            color = ContextCompat.getColor(chart.context, R.color.colorPrimaryDark)
+                        }
+                    }
                 } else {
-                    it
+                    null
                 }
-            }*/
 
-            val minDate = map.keys.min()
-            val maxDate = map.keys.max()
-            val minWeight = weights.min()
-            val maxWeight = weights.max()
+                chart.data = dataset ?.let {
+                    LineData(it)
+                } ?:let {
+                    null
+                }
+                chart.data ?: return
 
-            maxDate ?.let {
-                chart.xAxis.axisMaximum = it.toFloat() + (daysInView + chartDaysPadding) * millisInDay
-            }
-            minDate ?.let {
-                chart.xAxis.axisMinimum = it.toFloat() - (daysInView + chartDaysPadding) * millisInDay
-            }
-
-            maxWeight ?.let {
-                chart.axisLeft.axisMaximum = it + chartWeightPadding
-            }
-            minWeight ?.let {
-                chart.axisLeft.axisMinimum = it - chartWeightPadding
-            }
-
-            map.keys.max() ?. toFloat() ?.let { chart.moveViewToX(it) }
-
-            launch (UI) {
-                chart.animateX(
-                        map.size * resources.getInteger(R.integer.weightChartItemDrawTime)
+                val daysInView = it.resources.getInteger(
+                        R.integer.weightDatesChartDaysInView
                 )
 
+                val minDate = map.keys.min()
+                val maxDate = map.keys.max()
+                val minWeight = weights.min()
+                val maxWeight = weights.max()
+
+                maxDate?.let {
+                    chart.xAxis.axisMaximum = it.toFloat() + (daysInView + chartDaysPadding) * millisInDay
+                }
+                minDate?.let {
+                    chart.xAxis.axisMinimum = it.toFloat() - (daysInView + chartDaysPadding) * millisInDay
+                }
+
+                maxWeight?.let {
+                    chart.axisLeft.axisMaximum = it + chartWeightPadding
+                }
+                minWeight?.let {
+                    chart.axisLeft.axisMinimum = it - chartWeightPadding
+                }
+
+                map.keys.max()?.toFloat()?.let { chart.moveViewToX(it) }
+
+                launch(UI) {
+                    chart.animateX(
+                            map.size * resources.getInteger(R.integer.weightChartItemDrawTime)
+                    )
+                }
+            }
+        } finally {
+            launch (UI) {
                 chart.data ?. notifyDataChanged()
                 chart.notifyDataSetChanged()
                 chart.invalidate()

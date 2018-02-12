@@ -19,7 +19,7 @@
 
         <provider
             android:authorities="@string/contentProviderAuthority"
-            android:name="com.github.insanusmokrassar.androidutils.back.utils.database.SimpleORM.ContentProvider.CommonSQLiteContentProvider"
+            android:name="com.github.insanusmokrassar.SimpleAndroidORM.ContentProvider.CommonSQLiteContentProvider"
             android:enabled="true"
             android:exported="false" />
     </application>

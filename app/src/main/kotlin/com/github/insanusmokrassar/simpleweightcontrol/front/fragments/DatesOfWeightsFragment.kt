@@ -7,7 +7,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.github.insanusmokrassar.androidutils.front.utils.adapters.RecyclerView.RecyclerViewAdapter
+import com.github.insanusmokrassar.RecyclerViewAdapter.RecyclerViewAdapter
+import com.github.insanusmokrassar.SimpleAndroidORM.ORMSimpleDatabase.SimpleDatabase
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.WeightHelper
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
@@ -33,7 +34,7 @@ class DatesOfWeightsFragment : Fragment() {
                     list
             )
 
-            val update: (WeightHelper) -> Unit = {
+            val update: (SimpleDatabase<WeightData>) -> Unit = {
                 weightsDaysMap.refresh(it.find())
                 list.clear()
                 list.addAll(weightsDaysMap.pairs().sortedByDescending { it.first })

@@ -3,7 +3,7 @@ package com.github.insanusmokrassar.simpleweightcontrol.front.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import com.github.insanusmokrassar.androidutils.front.utils.adapters.RecyclerView.AbstractStandardViewHolder
+import com.github.insanusmokrassar.RecyclerViewAdapter.AbstractStandardViewHolder
 import com.github.insanusmokrassar.simpleweightcontrol.R
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.getTimeString
 import com.github.insanusmokrassar.simpleweightcontrol.back.utils.database.weightHelper
